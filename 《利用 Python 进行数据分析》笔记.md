@@ -183,7 +183,7 @@ In [16]: with open(path) as f:
 这样可以在退出代码块时，自动关闭文件  
 <br/><br/><br/>
 
-## **第 04 章：$\textbf{NumPy}$ 基础：数组和矢量计算**
+## **第 04 章：$\textbf{NumPy}$ 基础：数组和矢量计算 $\textbf{NumPy Basics: Arrays and Vectorized Computation}$**
 $S$ 被称为概率空间 $possibility$ $space$，或称样本空间 $sample$ $space$，是表示所有可能结果的一种简便表示法。可能发生的事件都是 $S$ 的子集  
 
 维恩图 $Venn$ $diagram$  
@@ -205,7 +205,7 @@ $\;\; \cup nion$
 独立事件：几个事件互相不影响。$P(A|B) = P(A)$，如果两个事件相互独立，则 $P(A|B) = P(A){\Rightarrow}P(A∩B)= P(A|B)P(B) = P(A)P(B)$
 <br/><br/><br/>
 
-## **第 05 章：离散概率分布的运用 $\textbf{using discrete probability distributions}$：善用期望 $\textbf{Manage Your Expectations}$**
+## **第 05 章：$\textbf{pandas}$ 入门 $\textbf{Getting Started with pandas}$**
 离散型随机变量的期望：$E(X) = \sum xP(X=x)\small(注：E(X) = μ)$<!--空格：&nbsp;-->
 
 X 的函数的期望为：$E(f(X)) = \sum{f(x)P(X=x)}$
