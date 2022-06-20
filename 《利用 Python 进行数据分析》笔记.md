@@ -1,0 +1,684 @@
+# **《利用 Python 进行数据分析 $\textbf{Python for Data Analysis}$》笔记**
+[简书阅读链接][01]
+## **第 01 章：准备工作 $\textbf{preliminaries}$**
+$$
+\begin{align*}
+\footnotesize重要的\ \normalsize Python\footnotesize \ 库：&①NumPy\hspace{20cm}\\
+                                &②pandas\\
+                                &③matplotlib\\
+                                &④IPython\footnotesize\ 和\ \normalsize Jupyter\\
+                                &⑤SciPy\\
+                                &⑥scikit-learn\\
+                                &⑦statsmodels\\
+\end{align*}
+$$
+引入惯例：
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+import statsmodels as sm
+```
+<br/><br/><br/>
+
+## **第 02 章：$\textbf{Python}$ 语法基础，$\textbf{IPython}$ 和 $\textbf{Jupyter Notebooks}$ $\textbf{Python Language Basics, IPython, and Jupyter Notebooks}$**
+$Jupyter\ Notebook$ 可用 $tab$ 键补全  
+函数名+$?$：显示文档注释字符串。函数名+$??$：显示函数的源码  
+```python
+%run    #结果和普通的运行方式 python script.py 相同，在 Jupyter Notebook 中也可用 $load
+```
+$IPython$ 常用快捷键如下  
+<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic020.png" width=60% />  
+假设有以下模块：
+```py
+# some_module.py
+PI = 3.14159
+
+def f(x):
+    return x + 2
+
+def g(a, b):
+    return a + b
+```
+如果想从同目录下的另一个文件访问 $some\_module.py$ 中定义的变量和函数，可以：
+```py
+import some_module
+result = some_module.f(5)
+pi = some_module.PI
+```
+或者：
+```py
+from some_module import f, g, PI
+result = g(5, PI)
+```
+使用 $as$ 关键词，可以给引入起不同的变量名：
+```py
+import some_module as sm
+from some_module import PI as pi, g as gf
+
+r1 = sm.f(pi)
+r2 = gf(6, pi)
+```
+$Python$ 函数默认参数设置（[解释一][02]；[解释二][03]）  
+<br/><br/><br/>
+
+## **第 03 章：$\textbf{Python}$ 的数据结构、函数和文件 $\textbf{Built-in Data Structures, Functions, and Files}$**
+变量拆分常用来迭代元组或列表序列：
+```py
+seq = [(1, 2, 3), (4, 5, 6), (7, 8, 9)]
+
+for a, b, c in seq:
+     print('a={0}, b={1}, c={2}'.format(a, b, c))
+
+a=1, b=2, c=3
+a=4, b=5, c=6
+a=7, b=8, c=9
+```  
+$Python$ 元组拆包，不需要的变量使用下划线，形如 $*\_$（[解释一][04]；[解释二][05]）  
+在列表中检查是否存在某个值远比字典和集合速度慢，因为 $Python$ 是线性搜索列表中的值，但在字典和集合中，在同样的时间内还可以检查其它项（基于哈希表）
+与元组类似，可以用加号将两个列表串联起来：  
+```py
+In [1]: [4, None, 'foo'] + [7, 8, (2, 3)]
+Out[1]: [4, None, 'foo', 7, 8, (2, 3)]
+```
+如果已经定义了一个列表，用 $extend$ 方法可以追加多个元素：
+```py
+x = [4, None, 'foo']
+x.extend([7, 8, (2, 3)])
+
+In [2]: x
+Out[2]: [4, None, 'foo', 7, 8, (2, 3)]
+```
+通过加法将列表串联的计算量较大，因为要新建一个列表，并且要复制对象。用 $extend$ 追加元素，尤其是到一个大列表中，更为可取。因此：
+```py
+everything = []
+for chunk in list_of_lists:
+    everything.extend(chunk)
+```
+要比串联方法快：
+```py
+everything = []
+for chunk in list_of_lists:
+    everything = everything + chunk
+```
+$sort$ 有一些选项，有时会很好用。其中之一是二级排序 $key$，可以用这个 $key$ 进行排序。例如，我们可以按长度对字符串进行排序：
+```py
+b = ['saw', 'small', 'He', 'foxes', 'six']
+b.sort(key=len)
+
+In [3]: b
+Out[3]: ['He', 'saw', 'six', 'small', 'foxes']
+```
+$Python$ 内建了一个 $enumerate$ 函数，可以返回 $(i, value)$ 元组序列：
+```py
+for i, value in enumerate(collection):
+   # do something with value
+
+some_list = ['foo', 'bar', 'baz']
+mapping = {}
+for i, v in enumerate(some_list):
+    mapping[v] = i
+
+In [4]: mapping
+Out[4]: {'bar': 1, 'baz': 2, 'foo': 0}
+```
+$sorted$ 函数可以从任意序列的元素返回一个新的排好序的列表：
+```py
+In [5]: sorted([7, 1, 2, 6, 0, 3, 2])
+Out[5]: [0, 1, 2, 2, 3, 6, 7]
+
+In [6]: sorted('horse race')
+Out[6]: [' ', 'a', 'c', 'e', 'e', 'h', 'o', 'r', 'r', 's']
+```
+$zip$ 函数：$Page\_60-Page\_61$；[补充解释][06]  
+对字典类型变量，可以用 $del$ 关键字或 $pop$ 方法（返回值的同时删除键）删除值
+用 $update$ 方法可以将一个字典与另一个融合：
+```py
+In [7]: d1.update({'b' : 'foo', 'c' : 12})
+
+In [8]: d1
+Out[8]: {'a': 'some value', 'b': 'foo', 7: 'an integer', 'c': 12}
+```
+$update$ 方法是原地改变字典，因此任何传递给 $update$ 的键的旧的值都会被舍弃  
+字典的值可以是任意 $Python$ 对象，而键通常是不可变的标量类型（整数、浮点型、字符串）或元组（元组中的对象必须是不可变的）。这被称为“可哈希性”。可以用 $hash$ 函数检测一个对象是否是可哈希的（可被用作字典的键）  
+$filter$ 条件可以被忽略，只留下表达式就行。例如，给定一个字符串列表，我们可以过滤出长度在 $2$ 及以下的字符串，并将其转换成大写：
+```py
+In [9]: strings = ['a', 'as', 'bat', 'car', 'dove', 'python']
+
+In [10]: [x.upper() for x in strings if len(x) > 2]
+Out[10]: ['BAT', 'CAR', 'DOVE', 'PYTHON']
+```
+$map()$ 会根据提供的函数对指定序列做映射，[详细讲解][07]  
+$extend()$ 函数用于在列表末尾一次性追加另一个序列中的多个值（用新列表扩展原来的列表），[详细讲解][08]  
+嵌套列表推导式  
+函数也是对象  
+接传入 $lambda$ 函数比编写完整函数声明要少输入很多字（也更清晰），甚至比将 $lambda$ 函数赋值给一个变量还要少输入很多字。看看下面这个简单得有些傻的例子：
+```py
+def apply_to_list(some_list, f):
+    return [f(x) for x in some_list]
+
+ints = [4, 0, 1, 5, 6]
+print(apply_to_list(ints, lambda x: x * 2))
+Out[11]: [8, 0, 2, 10, 12]
+
+print([x * 2 for x in ints])
+Out[12]: []
+```
+再来看另外一个例子。假设有一组字符串，想要根据各字符串不同字母的数量对其进行排序，可以传入一个 $lambda$ 函数到列表的 $sort$ 方法：
+```py
+In [13]: strings = ['foo', 'card', 'bar', 'aaaa', 'abab']
+In [14]: strings.sort(key=lambda x: len(set(list(x))))
+
+In [15]: strings
+Out[15]: ['aaaa', 'foo', 'abab', 'bar', 'card']
+```
+$lambda$ 函数之所以会被称为匿名函数，与 $def$ 声明的函数不同，原因之一就是这种函数对象本身是没有提供名称 $name$ 属性
+生成器；[补充解释][09]  
+用 $with$ 语句可以可以更容易地清理打开的文件：
+```py
+In [16]: with open(path) as f:
+   .....:     lines = [x.rstrip() for x in f]
+```
+这样可以在退出代码块时，自动关闭文件  
+<br/><br/><br/>
+
+## **第 04 章：$\textbf{NumPy}$ 基础：数组和矢量计算**
+$S$ 被称为概率空间 $possibility$ $space$，或称样本空间 $sample$ $space$，是表示所有可能结果的一种简便表示法。可能发生的事件都是 $S$ 的子集  
+
+维恩图 $Venn$ $diagram$  
+
+对立事件：“$A$ 不发生”事件可以用 $A'$ 表示。$A'$ 被称为 $A$ 的对立事件。$A'$ 包含事件 $A$ 所不包含的任何事件。 $P(A') = 1 - P(A)$  
+互斥事件：如果两个事件是互斥事件，则只有其中一个事件会发生，这两个事件不会同时发生  
+相交事件：如果两个事件相交，则这两个事件有可能同时发生。$P(A∪B) = P(A) + P(B) - P(A∩B)$  
+$i\cap tersection$  
+$\;\; \updownarrow$  
+$\;\; \cup nion$  
+
+
+全概率公式：$P(B) = P(A∩B) + P(A'∩B) = P(A) \times P(B|A) + P(A') \times P(B|A')$  
+
+贝叶斯定理：已知 <mark>$P(A)、P(B|A)、P(B|A')$</mark>，求$P(A|B)$。则 $P(A|B) = \cfrac{P(A∩B)}{P(B)} = \cfrac{P(A) \times P(B|A)}{P(A) \times P(B|A) + P(A') \times P(B|A')}$  
+
+相关事件：如果 $P(A|B)$ 不等于 $P(A)$，就说事件 $A$ 与事件 $B$ 的概率相互影响。
+
+独立事件：几个事件互相不影响。$P(A|B) = P(A)$，如果两个事件相互独立，则 $P(A|B) = P(A){\Rightarrow}P(A∩B)= P(A|B)P(B) = P(A)P(B)$
+<br/><br/><br/>
+
+## **第 05 章：离散概率分布的运用 $\textbf{using discrete probability distributions}$：善用期望 $\textbf{Manage Your Expectations}$**
+离散型随机变量的期望：$E(X) = \sum xP(X=x)\small(注：E(X) = μ)$<!--空格：&nbsp;-->
+
+X 的函数的期望为：$E(f(X)) = \sum{f(x)P(X=x)}$
+
+离散型随机变量的方差：$Var(X) = E(X-μ)^2 = \sum (x-μ)²P(X=x)\small(注：E(X) = \sum xP(X=x))$  
+
+离散型随机变量的标准差：$σ = \sqrt{Var(X)}$  
+
+线性变换的通用公式：<br/>
+期望：$E(aX+b) = aE(X) + b$  
+方差：$Var(aX+b) = a^2Var(X)$  
+$X$ 的 $n$ 个独立观测值的期望：$E(X_1+X_2+...X_n) = nE(X)$  
+$X$ 的 $n$ 个独立观测值的方差：$Var(X_1+X_2+...X_n) = nVar(X)$  
+
+随机变量加减计算：$\begin{cases}
+\footnotesize相加\begin{cases}
+\normalsize E(X+Y) = E(X) + E(Y)\\
+\normalsize Var(X+Y) = Var(X) + Var(Y)\footnotesize(注：方差加法仅适用于\colorbox{#FFFF00}{\textcolor{000000}{\normalsize独立随机变量}}\footnotesize，如果\ X\ 和\ Y\ 相互不独立，\normalsize Var(X+Y)\ne Var(X) + Var(Y))
+\end{cases}\\
+\footnotesize相减\begin{cases}
+\normalsize E(X-Y) = E(X) - E(Y)\\
+\normalsize Var(X-Y) = Var(X) + Var(Y)\footnotesize(注：若两个变量是\colorbox{#FFFF00}{\textcolor{000000}{\normalsize独立随机变量}}\footnotesize，将二者相减，\colorbox{#FFFF00}{\textcolor{000000}{\normalsize方差要相加}}\normalsize，\ Var(X-Y) = Var(X) + Var(Y))  
+\end{cases}
+\end{cases}$
+
+$aX$ 与 $bY$ 相加：
+$\begin{cases}
+ E(aX+bY) = aE(X) + bE(Y)\\
+ Var(aX+bY) = a^2Var(X) + b^2Var(Y)  
+\end{cases}$  
+$aX$ 与 $bY$ 相减：
+$\begin{cases}
+ E(aX-bY) = aE(X) - bE(Y)\\
+ Var(aX-bY) = a^2Var(X) + b^2Var(Y)  
+\end{cases}$
+<!--<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic011.png" width=60% />-->
+<br/><br/><br/>
+
+## **第 06 章：排列与组合 $\textbf{permutations and combinations}$：排序、排位、排 $\textbf{Making Arrangements}$**
+$n!-n$ $factorial-n$的阶乘  
+$n$ 个对象进行$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize线性方式}}$排位，数目共有$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize n!}} = n \times (n-1) \times (n-2)\cdots3 \times 2 \times 1$ 种  
+$n$ 个对象进行$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize圆形方式}}$排位，数目共有$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize (n-1)!}} = (n-1) \times (n-2)\cdots3 \times 2 \times 1$ 种  
+
+按类型排位：如果要为 $n$ 个对象排位，其中包括第一类对象 $j$ 个，第二类对象 $k$ 个，第三类对象 $m$ 个……则可能的排位数目为 $\cfrac{n!}{j!k!m!\ldots}$  
+排列 $permutations$：从一个群体（$n$ 个）中选取几个对象（$r$ 个），在$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize考虑}}$这几个对象$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize顺序}}$的情况下，求出选取方式的数目。公式为：
+${^n}P{_r}/P{_n^r}/A{_n^r} = P(n,\ k) = \cfrac{{n!}}{(n-r)!}$  
+组合 $combinations$：从一个群体（$n$ 个）中选取几个对象（$r$ 个），在$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize不考虑}}$这几个对象$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize顺序}}$的情况下，求出选取方式的数目。公式为：
+${^n}C{_r}/C{_n^r} = C(n,\ k) = \cfrac{{n!}}{r!(n-r)!}$
+<br/><br/><br/>
+
+## **第 07 章：几何分布、二项分布以及泊松分布 $\textbf{geometric, binomial, and poisson distributions}$：坚持离散 $\textbf{Keeping Things Discrete}$**
+$\colorbox{#FFFF00}{\textcolor{000000}{几何分布}}$ $geometric$ $distribution$：$X$~$Geo(p)$  
+$$
+\begin{align*}
+\footnotesize几何分布的条件：&①\footnotesize\ 进行一系列相互独立的实验\hspace{18cm}\\
+                            &②\footnotesize\ 每一次实验成败概率相同，成功概率为\normalsize \ p，\footnotesize失败概率为\normalsize \ q = 1-p\\
+                            &③\footnotesize\ 主要关注为取得第一次成功，需要进行的实验次数\\
+\end{align*}
+$$
+<!--几何分布的条件：$①$ 进行一系列相互独立的实验；$②$ 每一次实验成败概率相同，成功概率为 $p$，失败概率为 $q = 1-p$；$③$ 主要关注为取得第一次成功，需要进行的实验次数-->
+几何分布的概率算式，$\colorbox{yellow}{\textcolor{black}{在第 \(r\) 次实验取得第一次成功的概率}}$：$P(X=r) = pq^{r-1}$  
+实验 $r$ 次以上才能取得第一次成功的概率：$P(X>r) = q^r$  
+实验 $r$ 次或不到 $r$ 次即可取得第一次成功的概率：$P(X\leqslant{r}) = 1 - q^r$  
+几何分布的期望：$E(X) = \cfrac{1}{p}$ （[推导方法一][03]；[推导方法二][04]）  
+几何分布的方差：$Var(X) = \cfrac{q}{p^2}$ （[推导方法一][03]；[推导方法二][04]）
+<br/><br/><br/>
+
+$\colorbox{#FFFF00}{\textcolor{000000}{二项分布}}$ $binominal$ $distribution$：$X$~$B(n,p)$  
+$$
+\begin{align*}
+\footnotesize二项分布的条件：&①\footnotesize\ 进行一系列相互独立的实验\hspace{18cm}\\
+                            &②\footnotesize\ 每一次实验成败概率相同，成功概率为\normalsize \ p\footnotesize，失败概率为\normalsize \ 1-p\\
+                            &③\footnotesize\ 实验次数有限\\
+\end{align*}
+$$
+<!--二项分布的条件：$①$ 进行一系列相互独立的实验；$②$ 每一次实验成败概率相同，成功概率为 $p$，失败概率为 $1-p$；$③$ 实验次数有限-->
+二项分布和几何分布的情况一样，需要进行一系列独立实验，差别在于二项分布的关注点是获得成功的次数  
+根据 $n$ 与 $p$ 的不同数值，二项分布的形状会发生变化，$p$ 越接近 $0.5$，图形越对称。一般情况下，当 $p$ 小于 $0.5$ 时，图形向右偏斜；当 $p$ 大于 $0.5$ 时，图形向左偏斜  
+二项分布的概率算式，$\colorbox{yellow}{\textcolor{black}{取得 \(r\) 次成功的概率}}$：$P(X=r) = {^n}C{_r}p^{r}q^{n-r} = C{_n^r}p^{r}q^{n-r}\footnotesize——其中，\normalsize{^n}C{_r} = C{_n^r} = \cfrac{n!}{r!(n-r)!}$  
+二项分布的期望：$E(x) = np$ （[二项式定理解释一][05]、[解释二][06]；[推导方法一][07]；[推导方法二][08]）  
+二项分布的方差：$Var(x) = npq$ （[推导方法][09]）
+<br/><br/><br/>
+
+$\colorbox{#FFFF00}{\textcolor{000000}{泊松分布}}$ $Poisson$ $distribution$：$X$~$Po(λ)$  
+$$
+\begin{align*}
+\footnotesize泊松分布的条件：&①\footnotesize\ 单独事件在给定区间内随机、独立地发生，给定区间可以是时间或空间\hspace{13cm}\\
+                            &②\footnotesize\ 已知该区间内的事件平均发生次数（或者叫做发生率），且为有限数值。该事件平均发生次数通常用\normalsize \ λ\ \footnotesize 表示\\
+\end{align*}
+$$
+<!--泊松分布条件：$①$ 单独事件在给定区间内随机、独立地发生，给定区间可以是时间或空间；$②$ 已知该区间内的事件平均发生次数（或者叫做发生率），且为有限数值。该事件平均发生次数通常用 $λ$ 表示-->
+泊松分布的形状随着 $λ$ 的数值发生变化。$λ$ 小，则分布向右偏斜，随着 $λ$ 变大，分布逐渐变得对称。如果 $λ$ 是一个整数，$λ$ 和 $λ-1$，如果 $λ$ 不是整数，则众数为 $λ$。  
+当二项分布的 $p$ 很小的时候，两者比较接近（[解释说明][10]）。泊松分布的概率算式，$\colorbox{yellow}{\textcolor{black}{求给定 \(T\) 时间段内发生 \(r\) 次事件的概率}}$：$P(X=r) = \cfrac{λ^r{e^{-λ}}}{r!}$ （[推导方法][11]）  
+泊松分布的期望：$E(x) = λ$ （[推导方法][12]）  
+泊松分布的方差：$Var(x) = λ$ （[推导方法][12]）  
+$\colorbox{#FFFF00}{\textcolor{000000}{当 \(n\) 很大且 \(p\) 很小时，可以用 \(X\!\sim \!Po(np)\) 近似代替 \(X\!\sim \!B(n,\ p)\)}}。$泊松分布的期望 $λ$，方差 $λ$；二项分布的期望 $np$，方差 $npq$。此时 $λ≈np$（当 $n$ 大于 $50$ 且 $p$ 小于 $0.1$ 时，为典型的近似情况）  
+当 $X$，$Y$ 都是独立随机变量，如果 $X$~$Po(λ_x)$，$Y$~$Po(λ_y)$，则可以等效于 $X+Y$~$Po(λ_x+λ_y)$。如果 $X$ 和 $Y$ 都符合泊松分布，则 $X+Y$ 也符合泊松分布。
+<!--<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic013.png" width=60% />-->
+$$
+\begin{align*}
+\footnotesize证明：
+&P(X+Y=n)\hspace{23cm}\\
+=&\sum_{k=0}^{n}{P(X=k,Y=n-k)}\\
+=&\sum_{k=0}^{n}{P(X=k)P(Y=n-k)}\\
+=&\sum_{k=0}^{n}\cfrac{{λ_x}^k}{k!}e^{-λ_x}\cfrac{{λ_y}^{n-k}}{{(n-k)}!}e^{-λ_y}\\
+=&\cfrac{1}{n!}e^{-(λ_x+λ_y)}\sum_{k=0}^{n}\cfrac{n!}{k!(n-k)!}{{λ_x}^k}{{λ_y}^{n-k}}\\
+=&\cfrac{1}{n!}e^{-(λ_x+λ_y)}\sum_{k=0}^{n}C{_n^k}{λ_x}^{k}{λ_y}^{n-k}\\
+=&\cfrac{{(λ_x+λ_y)}^{n}}{n!}e^{-(λ_x+λ_y)}\\
+\end{align*}
+$$
+$\therefore X+Y$~$Po(λ_x+λ_y)$
+<br/><br/><br/>
+
+## **第 08 章：正态分布的运用 $\textbf{using the normal distribution}：$保持正态 $\textbf{Being Normal}$**
+离散数据由单个数值组成。  
+连续数据包含一个数据范围，这个范围内的任何一个数值都有可能发生。  
+连续概率分布可以用概率密度函数进行描述。概率密度函数下方的总面积必须等于 1。  
+
+正态分布，也可被称作高斯分布，通过参数 $μ$ 和 $σ^2$ 进行定义。$μ$ 指出曲线的中央位置，$σ$ 指出分散性。如果一个连续随机变量 $X$ 符合均值为 $μ$，标准差为 $σ$ 的正态分布，则通常写作 $X{\sim}N(μ,\ σ^2)$。$μ$ 指出曲线的中央位置，$σ^2$ 指出分散性。$σ^2$ 越大，正态分布曲线越扁平、越宽。无论把图形画多大，概率密度永远不会等于 0。  
+<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic014.png" width=60% />
+$$
+\begin{align*}
+\footnotesize正态概率计算三步法：&①\footnotesize\ 确定分布与范围（确定\ \normalsize{N(μ,\ σ^2)}\ \footnotesize中的均值和标准差）；\hspace{14cm}\\
+                                &②\footnotesize\ 使其标准化（通过标准分\ \normalsize{z = \cfrac{x-μ}{σ}}\ \footnotesize，标准化为\ \normalsize{Z{\sim}N(0,\ 1)}\ \footnotesize）；\\
+                                &③\footnotesize\ 查找概率（用方便易用的概率表查找概率，查到\ \normalsize{P(Z<z)}\ \footnotesize的概率）\\
+\end{align*}
+$$
+延伸：  
+$①P(Z>z) = 1 - P(Z<z)\qquad ②P(a<Z<b)=P(Z<b) - P(Z<a)\\③\footnotesize正态分布概率密度函数\normalsize{\ probability\ density\ function(PDF)}{\footnotesize：}$
+<span style="background-color: #3794FF; display: inline-block;">$\textcolor{yellow}{f(x)=\cfrac{1}{\sqrt{2\pi}σ}\,e^{-\cfrac{(x-μ)^2}{2σ^2}}}$</span>  
+连续概率分布的众数即概率密度最大处的数值。如果画出概率密度，则众数为曲线最高点处的数值。正态分布的众数为 $μ$  
+连续概率分布的中位数即 $P(X<a) = 0.5$ 处的数值，即将概率密度曲线下方的面积一分为二的数值。正态分布的中位数为 $μ$  
+众数和中位数并不常用，期望和方差更为重要
+<br/><br/><br/>
+
+## **第 09 章：再谈正态分布的运用 $\textbf{using the normal distribution ii}$：超越正态 $\textbf{Beyond Normal}$**
+当随机变量 $X$ 和 $Y$ 相互独立时，可以利用 $X$ 和 $Y$ 的分布来计算 $Z = X + Y$ 的分布（[解释一][13]；[解释二][14]；[解释三][15]；[解释四][16]；[解释五][17]；[解释六][18]）。假设 $X$ 和 $Y$ 是相互独立的连续型随机变量，其密度函数分别为 $f_X$ 和 $f_Y$，那么 $X + Y$ 的累积分布函数 $\normalsize{cumulative\ distribution\ function(CDF)}$为：
+$$
+\begin{align*}
+F_{Z}(z)
+&=P\{Z\leq z\}=P\{X+Y\leq z\}=\iint\limits_{x+y\leq z}f(x,\ y)\mathrm{d}x\mathrm{d}y\\
+&=\int_{-\infty}^{\infty}\mathrm{d}x\int_{-\infty}^{z-x}f(x,\ y)\mathrm{d}y\xLeftrightarrow{等价于}\int_{-\infty}^{\infty}\left[\ \int_{-\infty}^{z-y}f(x,\ y)\mathrm{d}y\right]\mathrm{d}x\footnotesize\ 或者\normalsize \int_{-\infty}^{\infty}\mathrm{d}y\int_{-\infty}^{z-y}f(x,\ y)\mathrm{d}x\xLeftrightarrow{等价于}\int_{-\infty}^{\infty}\left[\ \int_{-\infty}^{z-y}f(x,\ y)\mathrm{d}x\right]\mathrm{d}y\tag{*}\\
+&=\int_{-\infty}^{\infty}\left[\int_{-\infty}^{z-y}f_(x,\ y)\mathrm{d}x\right]\mathrm{d}y\xlongequal[x+y\le\ z\ \to u\ \le\ z]{固定\ z\ 与\ y，令\ u\ =\ x\ +\ y}\int_{-\infty}^{\infty}\left[\int_{-\infty}^{z}f_(u-y,\ y)\mathrm{d}u\right]\mathrm{d}y=\int_{-\infty}^{z}\left[{\int_{-\infty}^{\infty}f_(u-y,\ y)\mathrm{d}y}\right]\mathrm{d}u=\int_{-\infty}^{z}{f_Z(u)}\mathrm{d}u\tag{**}\\
+&\therefore\
+{f_Z(z)=}
+\begin{cases}
+{\int_{-\infty}^{\infty}f(z-y,\ y)\mathrm{d}y}\\
+\footnotesize或者利用\ x，y\ 的对等性\\
+{\int_{-\infty}^{\infty}f(x,\ z-x)\mathrm{d}x}\\
+\end{cases}
+\xrightarrow{X\ 与\ Y\ 相互独立\to f(x,\ y)=f_x(x)f_y(y)}
+{f_Z(z)=}
+\begin{cases}
+{\int_{-\infty}^{\infty}f_X(z-y)f_Y(y)\mathrm{d}y}\\
+{\int_{-\infty}^{\infty}f_X(x)f_Y(z-x)\mathrm{d}x}\\
+\end{cases}
+\\
+&=\iint\limits_{x+y\leq z}f_X{(x)}f_Y{(y)}\mathrm{d}x\mathrm{d}y=\int_{-\infty}^{\infty}\int_{-\infty}^{z-y}f_X(x)f_Y(y)\mathrm{d}x\mathrm{d}y=\int_{-\infty}^{\infty}\left[\ \int_{-\infty}^{z-y}f_X(x)\mathrm{d}x\right]f_Y(y)\mathrm{d}y=\int_{-\infty}^{\infty}F_X(z-y)f_Y(y)\mathrm{d}y\tag{***}\\
+\end{align*}
+$$
+分布函数 $F_{Z}$ 称为分布函数 $F_X$ 和概率密度函数 $f_Y$ 的卷积 $convolution$。对 (***) 式求导，可得 $Z$ 的概率密度函数为：
+$$
+\begin{equation*}
+f_Z=\frac{\mathrm{d}}{\mathrm{d}z}\int_{-\infty}^{\infty}F_X(z-y)f_Y(y)\mathrm{d}y=\int_{-\infty}^{\infty}\frac{\mathrm{d}}{\mathrm{d}z}F_X(z-y)f_Y(y)\mathrm{d}y=\int_{-\infty}^{\infty}f_X(z-y)f_Y(y)\mathrm{d}y\\
+\end{equation*}
+$$  
+类似地，利用对等性，可得到 $f_Z(z)=\int_{-\infty}^{\infty}f_X(x)f_Y(z-x)\mathrm{d}x$。基于此，通过[具体证明步骤][19]可得出：当相互独立的随机变量 $X$ 和 $Y$ 都是正态分布时，  
+$$
+\begin{equation*}
+f_X(x)=N(x;\ μ_X,\ {σ_X}^2)=\cfrac{1}{\sqrt{2\pi}σ_X}\,e^{-\cfrac{(x-μ_X)^2}{2σ_X^2}}\\
+\end{equation*}\\
+\begin{equation*}
+f_Y(y)=N(y;\ μ_Y,\ {σ_Y}^2)=\cfrac{1}{\sqrt{2\pi}σ_Y}\,e^{-\cfrac{(x-μ_Y)^2}{2σ_Y^2}}\\
+\end{equation*}
+$$
+可以计算出：  
+$Z = X + Y$ 的概率密度函数如下
+$$
+\begin{equation*}
+f_Z(z)=N(z;\ μ_Z,\ {σ_Z}^2)=\cfrac{1}{\sqrt{2\pi}σ_Z}\,e^{-\cfrac{(x-μ_Z)^2}{2σ_Z^2}}{\footnotesize，其中\ \normalsize μ_Z = μ_X + μ_Y，σ_Z^2 = σ_X^2 + σ_Y^2}\\
+\end{equation*}
+$$
+$W = X - Y$ 的概率密度函数如下
+$$
+\begin{equation*}
+f_W(w)=N(w;\ μ_W,\ {σ_W}^2)=\cfrac{1}{\sqrt{2\pi}σ_W}\,e^{-\cfrac{(x-μ_W)^2}{2σ_W^2}}{\footnotesize，其中\ \normalsize μ_W = μ_X - μ_Y，σ_W^2 = σ_X^2 + σ_Y^2}\\
+\end{equation*}
+$$
+以上 $X+Y$ 和 $X-Y$ 两种情况可简略表述为：  
+<span style="background-color: #3794FF; display: block; text-align:center;">$\textcolor{yellow}{X+Y \sim N(μ_X+μ_Y,\ σ_X^2+σ_Y^2)}$</span>
+<span style="background-color: #3794FF; display: block; text-align:center;">$\textcolor{yellow}{X-Y \sim N(μ_X-μ_Y,\ σ_X^2+σ_Y^2)}$</span>
+<!--
+$$
+\begin{align*}
+%{X+Y \sim N(μ_X+μ_Y,\ σ_X^2+σ_Y^2)}\\
+%{X-Y \sim N(μ_X-μ_Y,\ σ_X^2+σ_Y^2)}\\
+\end{align*}
+$$
+-->
+除此之外，$X+Y$ 和 $X-Y$ 图像的形状是一样的，这是因为方差相同（均为 $σ_X^2+σ_Y^2$）。但曲线的中心位置不同，这是因为均值不同（分别为 $μ_X+μ_Y$ 和 $μ_X-μ_Y$）  
+$$
+\begin{align*}
+\footnotesize如何计算\ X+Y\ \footnotesize的概率分布：&①\footnotesize\ 算出分布和范围\hspace{18cm}\\
+                                                    &②\footnotesize\ 将分布标准化\\
+                                                    &③\footnotesize\ 查找概率\\
+\end{align*}
+$$
+当 $X$~$N(μ,\ σ^2)$ 时（线性变换，$aX+b$ 类似 $4X,\ 4X+3$ 等。$a,\ b$ 都是数字），可以得到：<span style="background-color: #3794FF; display: inline-block;">$\textcolor{FFFF00}{aX+b\sim N(aμ+b,\ a^2σ^2)}$</span>  
+当 $X_n$~$N(μ,\ σ^2)$ 时，并且 $(X_1,\ X_2\ \cdots X_n)$ 均为 $X$ 的独立观察结果，可以得到：<span style="background-color: #3794FF; display: inline-block;">$\textcolor{FFFF00}{X_1+X_2+\cdots+X_n\sim N(nμ,\ nσ^2)}$</span>
+<br/><br/><br/>
+
+补充知识：二项式系数的[单峰性][20] $unimodality$ 及其证明  
+<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic015.png" width=60% />  
+在某些情况下，$\colorbox{yellow}{\textcolor{black}{泊松分布可以近似代替二项分布}}，$不过，在另一些情况下，$\colorbox{yellow}{\textcolor{black}{正态分布也可以近似代替二项分布}}$。如果符合二项分布 $X$~$B(n,\ p)$ 且 $np>5,\ nq>5$，则可以用正态分布 $X$~$N(np,\ npq)$ 近似代替二项分布（$μ=np$，$σ^2=npq$）。如果用正态分布近似代替二项分布，则需要进行$\colorbox{yellow}{\textcolor{black}{连续性修正 \(continuity\ correction\)}}$，才能确保得到正确的结果。
+$$
+\begin{align*}
+\footnotesize各种连续性修正：&①\footnotesize\le型概率：在一个连续标度上，离散数值\ a\ 会增长到\ (a+0.5)，实际需要计算\ P(X<a+0.5)\hspace{10cm}\\
+                            &②\footnotesize\ge型概率：在一个连续标度上，离散数值\ b\ 会减小到\ (b-0.5)，实际需要计算\ P(X>b-0.5)\\
+                            &③\footnotesize“介于型”概率：需要将两端的范围均扩展\ 0.5，需要求\ P(a-0.5<X<b+0.5)\\
+\end{align*}
+$$
+$\colorbox{yellow}{\textcolor{black}{正态分布也可以近似代替泊松分布}}$。如果符合泊松分布 $X$~$Po(λ)$ 且 $λ>15$，则可用正态分布 $X$~$N(λ,\ λ)$ 近似代替泊松分布（$μ=λ$，$σ^2=λ$）。根据书中例题，实际上，连续概率分布近似代替离散概率分布，都用到了连续性修正
+<br/><br/><br/>
+
+## **第 10 章：统计抽样的运用 $\textbf{using statistical sampling}$：抽取样本 $\textbf{Taking Samples}$**
+总体 $population$：所研究的所有事物的集合  
+
+样本 $sample$：从总体中选取的相对较小的集合，可用于做出关于总体本身的结论  
+
+偏倚 $biased$：如果样本不能代表目标总体，则这个样本存在~
+
+简单随机抽样 $simple\ random\ sampling$：随机选择抽样单位并形成样本，包括重复抽样和不重复抽样。具体方式包括抽签或使用随机编号生成器
+
+分层抽样 $stratified\ sampling$：将总体划分为几个组，或者叫做几个层，组或层中的单位都很相似，每一层都尽可能与其他层不一样（比如糖果按颜色分层），分层好以后，就对每一层执行简单随机抽样
+
+整群抽样 $cluster\ sampling$：将总体划分为几个群，其中每个群都尽量与其他群相似，可通过简单随机抽样抽取几个群，然后用这些群中的每一个抽样单位形成样本
+
+系统抽样 $systematic\ sampling$：选取一个数字 $K$，然后每到第 $K$ 个抽样单位就抽样一次
+<br/><br/><br/>
+
+## **第 11 章：总体和样本的估计 $\textbf{estimating populations and samples}$：进行预测 $\textbf{Making Predictions}$**
+点估计量 $poiint$ $estimator$ 由样本数据得出，是对总体参数 $population$ $parameter$ 的估计，$μ$ 是总体均值，$\hat{μ}$ 是 $μ$ 的点估计量。$\bar{x}$ 是样本均值
+$$
+\begin{equation*}
+{\footnotesize样本均值计算为\ }{\bar{x}=\cfrac{\sum x}{n}}{\footnotesize\ ，通过\ \normalsize \bar{x}\footnotesize\ 可得到总体均值的点估计量，即\ \normalsize \hat{μ}=\bar{x}}\\
+\end{equation*}
+$$
+$$
+\begin{equation*}
+{\footnotesize以样本数据估计总体方差\ }{s^2=\hat{σ}^2=\cfrac{\sum (x-\bar{x})^2}{n-1}}{\footnotesize\ ，总体方差点估计量的式子通常写作\ \normalsize s^2}\\
+\end{equation*}
+$$
+$$
+\begin{equation*}
+{\footnotesize总体成功比例的点估计量\rightarrow\ }{\hat{p}=p_s}{\footnotesize\ \leftarrow 样本成功比例，其中\ }{p_s=\cfrac{\footnotesize成功数目}{\footnotesize样本数目}}\\
+\end{equation*}
+$$
+<br/><br/><br/>
+
+$\colorbox{yellow}{\textcolor{black}{为样本比例计算概率}}$  
+计算样本比例本身的概率（样本比例的分布），即算出在一个整体中出现一种特定比例的概率——
+$$
+\begin{align*}
+\footnotesize 具体做法如下：&①\footnotesize\ 查看与特定样本大小相同的所有样本\hspace{17cm}\\
+                            &②\footnotesize\ 观察所有样本比例形成的分布，然后求出比例的期望和方差\\
+                            &③\footnotesize\ 得出上述比例的分布后，利用该分布求出概率\\
+\end{align*}
+$$
+考虑从同一个总体中取得的所有大小为 $n$ 的可能样本，由这些样本的比例形成一个分布，这就是“比例的抽样分布”。用 $P_s$ 代表样本比例随机变量  
+比例取决于样本中所选类型 $X$ 的数目（即成功数目，$X$ 的分布为二项分布，$X$~$B(n,\ p)$），其本身是一个随机变量，可以将此记为 $P_s$，则 $P_s=\cfrac{X}{n}$  
+<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic016.png" width=60% />  
+$P_s$ 的期望：$E(P_s) = E\left(\cfrac{X}{n}\right)=\cfrac{E(X)}{n}=\cfrac{np}{n}=p$  
+$P_s$ 的方差：$Var(P_s) = Var\left(\cfrac{X}{n}\right)=\cfrac{Var(X)}{n^2}=\cfrac{npq}{n^2}=\cfrac{pq}{n}$  
+比例标准误差 $standard$ $error$ $of$ $proportion$ $=P_s$ 的标准差 $=\sqrt{Var(P_s)}=\sqrt{\cfrac{pq}{n}}$（$n$ 越大，比例标准误差越小；即样本中包含的对象越多，用样本比例作为总体比例的估计量就越可靠）  
+如果 $n>30$，则 $P_s$ 符合正态分布，于是 $P_s$~$N(p,\ \cfrac{pq}{n})$，使用这个公式时需要进行连续性修正：$\pm\cfrac{1}{2n}$
+<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic017.png" width=60% />
+<br/><br/><br/>
+
+$\colorbox{yellow}{\textcolor{black}{为样本均值计算概率}}$  
+为了计算样本均值的概率，先要得出样本均值的概率分布——
+$$
+\begin{align*}
+\footnotesize 具体做法如下：&①\footnotesize\ 查看与所研究的样本大小相同的所有可能样本\hspace{16cm}\\
+                            &②\footnotesize\ 查看所有样本形成的分布，求出样本均值的期望和方差\\
+                            &③\footnotesize\ 得出样本均值的分布后，用该分布求出概率\\
+\end{align*}
+$$
+考虑从同一个总体中取得的所有大小为 $n$ 的可能样本，由这些样本的均值形成一个分布，这就是“均值的抽样分布”。用 $\bar{X}$ 代表样本均值随机变量  
+<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic018.png" width=60% />  
+$\bar{X}$ 的期望：$E(\bar{X})=E(\cfrac{X_1+X_2+\cdots+X_n}{n})=\cfrac{1}{n}E(X_1+X_2+\cdots+X_n)=\cfrac{1}{n}\left[E(X_1)+E(X_2)+\cdots+E(X_n)\right]=\cfrac{1}{n}\left[μ+μ+\cdots+μ\right]=\cfrac{1}{n}(nμ)=μ$  
+$\bar{X}$ 的方差：$Var(\bar{X})=Var(\cfrac{X_1+X_2+\cdots+X_n}{n})=\cfrac{1}{n^2}\left[Var(X_1)+Var(X_2)+\cdots+Var(X_n)\right]=\cfrac{1}{n^2}\left[σ^2+σ^2+\cdots+σ^2\right]=\cfrac{1}{n^2}(nσ^2)=\cfrac{σ^2}{n}$  
+均值标准误差 $standard$ $error$ $of$ $the$ $mean$ $=\bar{X}$ 的标准差 $=\sqrt{Var(\bar{X})}=\cfrac{σ}{\sqrt{n}}$（$n$ 越大，均值标准误差越小；即样本中包含的个体越多，用样本均值作为总体均值的估计量就越可靠）  
+如果 $X$~$N(μ,\ σ^2)$，则 $\bar{X}$~$N(μ,\ \cfrac{σ^2}{n})$；如果 $X$ 不符合正态分布，但 $n$ 足够大，仍可用正态分布近似，用正态分布求 $\bar{X}$ 的概率，也被称为“中心极限定理”  
+中心极限定理 $central$ $limit$ $theorem$：如果从一个非正态总体 $X$ 中抽取一个样本，且样本很大，则 $\bar{X}$ 的分布近似为正态分布，当总体的均值和方差为 $μ$ 和 $σ^2$，且 $n$ 很大（比如大于 $30$），那么 $\bar{X}$~$N(μ,\ \cfrac{σ^2}{n})$，更具体一些：  
+$$
+\begin{align*}
+{\footnotesize X\ 满足二项分布（而且其中\ n>30）时\ X \sim B(n,\ p)\rightarrow\bar{X} \sim N(np,\ pq)}\\
+{\footnotesize X\ 满足泊松分布（而且其中\ n>30）时\ X \sim Po(λ)\rightarrow\bar{X} \sim N(λ, \cfrac{λ}{n})}\\
+\end{align*}
+$$
+<br/><br/><br/>
+
+## **第 12 章：置信区间的构建 $\textbf{constructing confidence intervals}$：自信地猜测 $\textbf{Guessing with Confidence}$**
+$$
+\begin{align*}
+\footnotesize 求解置信区间的步骤：&①\footnotesize\ 选择总体统计量\hspace{19cm}\\
+                                &②\footnotesize\ 求出所选统计量的抽样分布\\
+                                &③\footnotesize\ 决定置信水平\\
+                                &④\footnotesize\ 求出置信上下限\\
+\end{align*}
+$$
+置信区间简便算法：
+$$
+\begin{array}{c} % 总表格
+    \begin{array}{l|l|l|l|l}
+        \text{\footnotesize总体统计量} & \text{\footnotesize总体分布} & \text{\footnotesize条件} & \text{\footnotesize置信区间}\\
+        \hline\\
+        μ & \footnotesize正态 & {\begin{aligned}&\footnotesize σ^2\ 已知\\&\footnotesize n\ 可大可小\\&\footnotesize \bar{x}\ 为样本均值\end{aligned}} & \left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right) \\
+        \hline\\
+        μ & \footnotesize非正态 & {\begin{aligned}&σ^2\ \footnotesize 已知\\&n\ \footnotesize 很大（至少\ \normalsize 30）\\&\bar{x}\ \footnotesize 为样本均值\end{aligned}} & \left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right) \\
+        \hline\\
+        μ & \footnotesize正态或非正态 & {\begin{aligned}&σ^2\ \footnotesize 未知\\&n\ \footnotesize 很大（至少\ \normalsize 30）\\&\bar{x}\ \footnotesize 为样本均值\\&s^2\ \footnotesize 为样本方差\end{aligned}} & \left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right) \\
+        \hline\\
+        p & \footnotesize二项 & {\begin{aligned}&n\ \footnotesize 很大\\&p_s\ \footnotesize 为样本比例\\&q_s=1-p_s\end{aligned}} & \left(p_s-c\sqrt{\cfrac{p_sq_s}{n}},\ p_s+c\sqrt{\cfrac{p_sq_s}{n}}\right) \\
+        \hline\\
+    \end{array}
+    &
+    \begin{array}{l|l}
+        \text{\footnotesize置信水平} & \text{C\ \footnotesize 值}\\
+        \hline\\
+        \text{90\%} & \text{1.64}\\
+        \hline\\
+        \text{95\%} & \text{1.96}\\
+        \hline\\
+        \text{99\%} & \text{2.58}\\
+    \end{array}
+\end{array}
+$$
+
+<!--<style>table{margin: auto; border: 1px solid #b9b9b9;}</style>-->
+<!--
+<style>
+    table {
+        margin: auto; 
+        border-style: solid;
+    }
+    td, th {
+        border-style: solid;
+    }
+</style>
+| Table 1 | Table 2 |
+| -- | -- |
+| <table><tr><th>总体统计量</th><th>总体分布</th><th>条件</th><th>置信区间</th></tr><tr><td>$μ$</td><td>正态</td><td>$σ^2$ 已知<br>n 可大可小<br>$\bar{x}$ 为样本均值</td><td>$\left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right)$</td></tr><tr><td>$μ$</td><td>非正态</td><td>$σ^2$ 已知<br>n 很大（至少 $30$）<br>$\bar{x}$ 为样本均值</td><td>$\left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right)$</td></tr><tr><td>$μ$</td><td>正态或非正态</td><td>$σ^2$ 未知<br>n 很大（至少 $30$）<br>$\bar{x}$ 为样本均值<br>$s^2$ 为样本方差</td><td>$\left(\bar{x}-c\cfrac{s}{\sqrt{n}},\ \bar{x}+c\cfrac{s}{\sqrt{n}}\right)$</td></tr><tr><td>$p$</td><td>二项</td><td>$n$ 很大<br>$p_s$ 为样本比例<br>$q_s=1-p_s$</td><td>$\left(p_s-c\sqrt{\cfrac{p_sq_s}{n}},\ p_s+c\sqrt{\cfrac{p_sq_s}{n}}\right)$</td></tr></table> | <table><tr><th>置信水平</th><th>C 值</th></tr><tr><td>90%</td><td>1.64</td></tr><tr><td>95%</td><td>1.96</td></tr><tr><td>99%</td><td>2.58</td></tr></table> |
+-->
+<!--
+---
+| 总体统计量 | 总体分布 | 条件 | 置信区间 |
+| :- | :- | :- | :- |
+| μ | 正态 | $σ^2$ 已知<br>n 可大可小<br>$\bar{x}$ 为样本均值 | $\left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right)$ |
+| μ | 非正态 | $σ^2$ 已知<br>n 很大（至少 $30$）<br>$\bar{x}$ 为样本均值 | $\left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right)$ |
+| μ | 正态或非正态 | $σ^2$ 未知<br>n 很大（至少 $30$）<br>$\bar{x}$ 为样本均值<br>$s^2$ 为样本方差 | $\left(\bar{x}-c\cfrac{s}{\sqrt{n}},\ \bar{x}+c\cfrac{s}{\sqrt{n}}\right)$ |
+| p | 二项 | $n$ 很大<br>$p_s$ 为样本比例<br>$q_s=1-p_s$ | $\left(p_s-c\sqrt{\cfrac{p_sq_s}{n}},\ p_s+c\sqrt{\cfrac{p_sq_s}{n}}\right)$ |
+---
+| 置信水平 | C 值 |
+| :- | :-|
+| 90% | 1.64 |
+| 95% | 1.96 |
+| 99% | 2.58 |
+-->
+一般情况下，置信区间的计算式为：<span style="background-color: #3794FF; display: inline-block;">$\textcolor{yellow}{统计量\pm (误差范围)}$</span>。误差范围等于 $c$ 与检验统计量的标准差的乘积：<span style="background-color: #3794FF; display: inline-block;">$\textcolor{yellow}{误差范围 =c\times(统计量的标准差)}$</span>
+
+$t$ 分布的标准分的算式：$T=\cfrac{\bar{X}-μ}{s/\sqrt{n}}$  
+$t$ 分布的置信上下限：$\left(\bar{x}-t(v)\cfrac{s}{\sqrt{n}},\ \bar{x}+t(v)\cfrac{s}{\sqrt{n}}\right)$ （总体统计量：$μ$——总体分布：$\underset{\sim}{\footnotesize正}\underset{\sim}{\footnotesize态}$或$\underset{\sim}{\footnotesize非}\underset{\sim}{\footnotesize正}\underset{\sim}{\footnotesize态}$——条件：$\underline{σ^2\ \footnotesize未知}+\underline{n\ \footnotesize很小<小于\normalsize\ 30\footnotesize >}+\underline{\bar{x}\ \footnotesize为样本均值}+\underline{s^2\ \footnotesize为样本方差}$。为了求出 $t(v)$，需要查找 $t$ 分布概率表，为此，用 $v=n-1$ 和确定下来的置信水平求出置信区间）
+<br/><br/><br/>
+
+## **第 13 章：假设检验的运用 $\textbf{using hypothesis tests}$：研究证据 $\textbf{Look At The Evidence}$**
+$$
+\begin{align*}
+\footnotesize 假设检验六步骤：&①\footnotesize\ 确定要进行检验的假设\hspace{19cm}\\
+                            &②\footnotesize\ 选择检验统计量\\
+                            &③\footnotesize\ 确定用于决做策的拒绝域\normalsize\ critical\ region\\
+                            &④\footnotesize\ 求出检验统计量的\normalsize\ p\ \footnotesize值\\
+                            &⑤\footnotesize\ 查看样本结果是否位于拒绝域内\\
+                            &⑥\footnotesize\ 作出决策
+\end{align*}
+$$
+进行假设检验即选定一个断言，然后借助统计证据对其进行检验
+
+所检验的断言被称为原假设 $null\ hypothesis$，用 $H_0$ 表示。除非有有力的证据证明断言不正确，否则就接受断言
+
+备择假设 $alternate\ hypothesis$ 即在有充分证据拒绝原假设 $H_0$ 的情况下将接受的假设，用 $H_1$ 表示
+
+检验统计量即用于对假设进行检验的统计量，是与检验具有密切关系的统计量。选择检验统计量的时候，假定 $H_0$ 为真
+
+显著性水平用 $\alpha$ 表示，表示希望在观察结果的不可能程度达到多大时拒绝 $H_0$
+
+拒绝域为一组数值，代表可用于否定原假设的最极端证据。选择拒绝域时，需考虑显著性水平，还要考虑用单尾还是双尾进行检验
+
+单尾检验 $one-tailed\ test$ 的拒绝域位于数据的左侧或右侧，双尾检验 $two-tailed\ test$ 的数据一分为二位于数距的两侧。可根据备择假设选择尾部
+
+$P$ 值即取得样本结果或取得拒绝域方向上的更极端结果的概率
+
+如果 $P$ 值位于拒绝域中，则有充足的理由拒绝原假设；如果 $P$ 值位于拒绝域以外，则没有充足的证据。
+<br/><br/><br/>
+
+
+第一类错误 $type\ I\ error$ 即在原假设正确时却拒绝原假设。发生第一类错误的概率为 $\alpha$——即检验的显著性水平
+
+第二类错误 $type\ II\ error$ 即在原假设错误时却接受原假设。发生第二类错误的概率用 $\beta$ 表示
+
+为了求出 $\beta$，备择假设必须为一个特定数值。于是求出检验拒绝域以外的数值范围，然后求出以 $H_1$ 为条件得到这个数值范围的概率
+<br/><br/><br/>
+
+## **第 14 章：$\chi^2$ 分布 $\textbf{the χ² distribution}$：继续探讨…… $\textbf{There's Something Going On...}$**
+通过 $\chi^2$ 分布可以进行拟合优度检验和变量独立性检验。检验统计量为 $\chi^2=\sum\cfrac{(O-E)^2}{E}$，其中 $O$ 指的是观察频数，$E$ 指的是期望频数
+
+如果在 $\chi^2$ 分布中用 $\chi^2$ 作为检验统计量，则写作：$\chi^2$~$\chi^2_\alpha(v)$ 其中 $v$ 为自由度 $the\ number\ of\ degrees\ of\ freedom$，$\alpha$ 为显著性水平 $the\ level\ of\ significance$
+
+在拟合优度检验 $goodness\ of\ fit\ test$ 中，$v$ 等于组数减去限制数
+
+在两个变量的独立性检验中，若列联表为 $h$ 行 $k$ 列，则：$v=(h-1)\times(k-1)$
+<br/><br/><br/>
+
+## **第 15 章：相关与回归 $\textbf{correlation and regression}$：我的线条如何？ $\textbf{What’s My Line?}$**
+单变量数据 $univariate\ data$ 仅涉及一个变量，二变量数据 $bivariate\ data$ 涉及两个变量  
+自变量/解释变量 $independent/explanatory\ variable$  
+因变量/反应变量 $dependent/response\ variable$  
+散点图 $scatter\ diagram$/散布图 $scatter\ plot$  
+相关性即变量之间的数学关系，通过散点图上的点的独特构成模式，可以识别出散点图上的各种相关性。如果散点图上的点几乎呈直线分布，则相关性为线性  
+正线性相关 $positive\ linear\ correlation$  
+负线性相关 $negative\ linear\ correlation$  
+不相关 $no\ correlation$  
+正线性相关即 $x$ 的低端值对应于 $y$ 的低端值，$x$ 的高端值对应于 $y$ 的高端值；负线性相关即 $x$ 的低端值对应于 $y$ 的高端值，$x$ 的高端值对应于 $y$ 的低端值。如果 $x$ 和 $y$ 的数值分布表现出随机模式，则它们不存在相关性  
+$\colorbox{yellow}{\textcolor{black}{两个变量之间存在相关关系并不一定意味着一个变量会影响另一个变量，也不意味着二者存在实际关系}}$
+<br/><br/><br/>
+
+与数据点拟合程度最高的线称为最佳拟合线 $line\ of\ best\ fit$  
+$y_i$ 表示数据集中的每一个 $y$ 值，$\hat{y_i}$ 表示通过最佳拟合线得出的估计值  
+<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic019.png" width=60% />  
+距离平方之和被称为误差平方和 $sum\ of\ squared\ errors$，英文缩写为 $SSE$。算式为：$SSE=\sum(y-\hat{y})^2$  
+$y=a+bx$ 中的 $b$ 代表这条直线的斜率 $slope$，或称陡度 $steepness$。使得 $SSE$ 最小的 $b$ 值为：$b=\cfrac{\sum\left[\left(x-\bar{x}\right)\left(y-\bar{y}\right)\right]}{\sum(x-\bar{x})^2}$，求得 $b$ 值后，由于最佳拟合线最好穿过 $(\bar{x},\ \bar{y})$，代入公式 $y=a+bx$，即可求得 $a=\bar{y}-b\bar{x}$。此法称为最小二乘法 $least\ squares\ regression$，直线 $y=a+bx$ 称为回归线 $regression\ line$  
+<br/><br/><br/>
+
+精确线性相关 $accurate\ linear\ correlation$  
+非线性相关 $no\ linear\ correlation$  
+相关系数 $correlation\ coefficient$  
+相关系数是介于 $—1$ 和 $1$ 之间的一个数，描述了各个数据点与直线的偏离程度。通过它可以量度回归线与数据的拟合度，通常用字母 $r$ 表示  
+如果 $r$ 为负，则两个变量之间存在负线性相关 $negative\ linear\ correlation$。$r$ 越接近 $—1$，相关性越强，数据点距离直线越近。如果 $r$ 等于 $—1$，则数据为完全负线性相关 $perfect\ negative\ linear\ correlation$，所有数据点都在一条直线上;  
+如果 $r$ 为正，则两个变量之间存在正线性相关 $positive\ linear\ correlation$。$r$ 越接近 $1$，相关性越强。如果 $r$ 等于 $1$，则数据完全正线性相关 $perfect\ positive\ linear\ correlation$;  
+随着 $r$ 向 $0$ 靠近，线性相关性 $linear\ correlation$ 变弱。于是回归线无法像 $r$ 接近 $1$ 或接近 $—1$ 时那样准确地预测 $y$ 值，数据模式可能会随机变化，或者说变量之间的关系可能是非线性的。如果 $r$ 等于 $0$，则不存在相关性 $no\ correlation$  
+相关系数 $r$ 计算公式：$r=\cfrac{bs_x}{s_y}，\ s_x=\sqrt{\cfrac{\sum(x-\bar{x})^2}{n-1}}$ 系样本中 $x$ 值的标准差，$s_y=\sqrt{\cfrac{\sum(y-\bar{y})^2}{n-1}}$ 系样本中 $y$ 值的标准差
+<br/><br/><br/>
+
+[01]: https://www.jianshu.com/p/04d180d90a3f
+[02]: http://c.biancheng.net/view/2256.html
+[03]: https://python3-cookbook.readthedocs.io/zh_CN/latest/c07/p05_define_functions_with_default_arguments.html
+[04]: https://www.jianshu.com/p/5066e9e9bce9
+[05]: https://www.pythontutorial.net/python-basics/python-unpacking-tuple/
+[06]: https://www.runoob.com/python/python-func-zip.html
+[07]: https://www.runoob.com/python/python-func-map.html
+[08]: https://www.runoob.com/python/att-list-extend.html
+[09]: https://www.liaoxuefeng.com/wiki/1016959663602400/1017318207388128
+
+
+
+[10]: https://www.zhihu.com/question/26441147/answer/429569625
+[11]: https://pangruitao.com/post/96
+[12]: https://blog.csdn.net/saltriver/article/details/52969014
+[13]: https://blog.nex3z.com/2019/01/19/probability-cheat-sheet-17/
+[14]: https://bingw.blog.csdn.net/article/details/53097048
+[15]: https://blog.csdn.net/andyjkt/article/details/108124198
+[16]: http://course.sdu.edu.cn/Download2/20150526151446004.pdf
+[17]: https://wulc.me/2016/10/08/%E6%A6%82%E7%8E%87%E8%AE%BA%E4%B8%8E%E6%95%B0%E7%90%86%E7%BB%9F%E8%AE%A1%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86(2)--%E4%BA%8C%E7%BB%B4%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F%E7%9A%84%E5%88%86%E5%B8%83/
+[18]: https://www.milefoot.com/math/stat/rv-sums.htm
+[19]: https://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables
+[20]: https://www.zgbk.com/ecph/words?SiteID=1&ID=57125&SubID=61844
