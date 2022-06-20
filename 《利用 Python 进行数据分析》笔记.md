@@ -29,7 +29,7 @@ $Jupyter\ Notebook$ 可用 $tab$ 键补全
 %run    #结果和普通的运行方式 python script.py 相同，在 Jupyter Notebook 中也可用 $load
 ```
 $IPython$ 常用快捷键如下  
-<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic020.png" width=60% />  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic001.png" width=60% />  
 假设有以下模块：
 ```py
 # some_module.py
