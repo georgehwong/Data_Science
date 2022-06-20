@@ -184,9 +184,11 @@ In [16]: with open(path) as f:
 <br/><br/><br/>
 
 ## **第 04 章：$\textbf{NumPy}$ 基础：数组和矢量计算 $\textbf{NumPy Basics: Arrays and Vectorized Computation}$**
-$S$ 被称为概率空间 $possibility$ $space$，或称样本空间 $sample$ $space$，是表示所有可能结果的一种简便表示法。可能发生的事件都是 $S$ 的子集  
+在本章及全书中，会使用标准的 $NumPy$ 惯用法 $import\ numpy\ as\ np$。当然也可以在代码中使用 $from\ numpy\ import\ *$，但不建议这么做。$numpy$ 的命名空间很大，包含许多函数，其中一些的名字与 $Python$ 的内置函数重名（比如 $min$ 和 $max$）
 
-维恩图 $Venn$ $diagram$  
+
+
+
 
 对立事件：“$A$ 不发生”事件可以用 $A'$ 表示。$A'$ 被称为 $A$ 的对立事件。$A'$ 包含事件 $A$ 所不包含的任何事件。 $P(A') = 1 - P(A)$  
 互斥事件：如果两个事件是互斥事件，则只有其中一个事件会发生，这两个事件不会同时发生  
