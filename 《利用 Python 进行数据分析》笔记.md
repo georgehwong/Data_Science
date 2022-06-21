@@ -184,7 +184,52 @@ In [16]: with open(path) as f:
 <br/><br/><br/>
 
 ## **第 04 章：$\textbf{NumPy}$ 基础：数组和矢量计算 $\textbf{NumPy Basics: Arrays and Vectorized Computation}$**
-在本章及全书中，会使用标准的 $NumPy$ 惯用法 $import\ numpy\ as\ np$。当然也可以在代码中使用 $from\ numpy\ import\ *$，但不建议这么做。$numpy$ 的命名空间很大，包含许多函数，其中一些的名字与 $Python$ 的内置函数重名（比如 $min$ 和 $max$）
+在本章及全书中，会使用标准的 $NumPy$ 惯用法 $import\ numpy\ as\ np$。当然也可以在代码中使用 $from\ numpy\ import\ *$，但不建议这么做。$numpy$ 的命名空间很大，包含许多函数，其中一些的名字与 $Python$ 的内置函数重名（比如 $min$ 和 $max$）  
+$NumPy$ 的 $ndarray$：一种多维数组对象  
+$ndarray$ 的数据类型：$dtype$（数据类型）是一个特殊的对象，它含有 $ndarray$ 将一块内存解释为特定数据类型所需的信息  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic002.png" width=60% />  
+可以通过 $ndarray$ 的 $astype$ 方法明确地将一个数组从一个 $dtype$ 转换成另一个 $dtype$：
+```py
+In [1]: arr = np.array([1, 2, 3, 4, 5])
+
+In [2]: arr.dtype
+Out[2]: dtype('int64')
+
+In [3]: float_arr = arr.astype(np.float64)
+
+In [4]: float_arr.dtype
+Out[4]: dtype('float64')
+```
+在本例中，整数被转换成了浮点数。如果将浮点数转换成整数，则小数部分将会被截取删除：
+```py
+In [5]: arr = np.array([3.7, -1.2, -2.6, 0.5, 12.9, 10.1])
+
+In [6]: arr
+Out[6]: array([3.7,  -1.2,  -2.6,   0.5,  12.9,  10.1])
+
+In [7]: arr.astype(np.int32)
+Out[7]: array([3, -1, -2,  0, 12, 10], dtype=int32)
+```
+如果某字符串数组表示的全是数字，也可以用 $astype$ 将其转换为数值形式：
+```py
+In [8]: numeric_strings = np.array(['1.25', '-9.6', '42'], dtype=np.string_)
+
+In [9]: numeric_strings.astype(float)
+Out[9]: array([  1.25,  -9.6 ,  42.  ])
+```
+调用 $astype$ 总会创建一个新的数组（一个数据的备份），即使新的 $dtype$ 与旧的 $dtype$ 相同  
+数组很重要，因为它使你不用编写循环即可对数据执行批量运算。$NumPy$ 用户称其为矢量化（$vectorization$）。大小相等的数组之间的任何算术运算都会将运算应用到元素级；数组与标量的算术运算会将标量值传播到各个元素；大小相同的数组之间的比较会生成布尔值数组  
+可以传入一个以逗号隔开的索引列表来选取单个元素。也就是说，下面两种方式是等价的：
+```py
+In [10]: arr2d[0][2]
+Out[10]: 3
+
+In [11]: arr2d[0, 2]
+Out[11]: 3
+```
+二维数组的索引方式:  
+
+
 
 
 
