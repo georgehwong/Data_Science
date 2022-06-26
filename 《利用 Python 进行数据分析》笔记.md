@@ -227,254 +227,382 @@ Out[10]: 3
 In [11]: arr2d[0, 2]
 Out[11]: 3
 ```
-二维数组的索引方式:  
+二维数组的索引方式：  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic003.png" width=60% />  
+可以一次传入多个切片，就像传入多个索引那样：
+```py
+In [12]: arr2d[:2, 1:]
+Out[12]: 
+array([[2, 3],
+       [5, 6]])
+```
+“只有冒号”表示选取整个轴。对切片表达式的赋值操作也会被扩散到整个选区  
+要选择除 $"Bob"$ 以外的其他值，既可以使用不等于符号（$!=$），也可以通过 $\sim$ 对条件进行否定  
+花式索引跟切片不一样，它总是将数据复制到新数组中  
+$①\ reshape$ 用法：$(2,\ 2,\ 3)\rightarrow$先看最左边的 $2$，理解为 $2$ 行，剩下部分可以看做 $(2,\ 3)$ 大小的二维矩阵  
+总体理解就是：一个 $2$ 行，每行包含一个 $2$ 行 $3$ 列的矩阵块的矩阵  
+$②\ $对于高维数组，$transpose$ 需要得到一个由轴编号组成的元组才能对这些轴进行转置（比较费脑子），这里第一个轴被换成了第二个，第二个轴被换成了第一个，最后一个轴不变（[补充解释][10]）：  
+```py
+In [13]: arr = np.arange(16).reshape((2, 2, 4))
 
+In [14]: arr
+Out[14]: 
+array([[[ 0,  1,  2,  3],
+        [ 4,  5,  6,  7]],
+       [[ 8,  9, 10, 11],
+        [12, 13, 14, 15]]])
 
+In [15]: arr.transpose((1, 0, 2))
+Out[15]: 
+array([[[ 0,  1,  2,  3],
+        [ 8,  9, 10, 11]],
+       [[ 4,  5,  6,  7],
+        [12, 13, 14, 15]]])
+```
+$ndarray$ 还有一个 $swapaxes$ 方法，它需要接受一对轴编号：[补充解释一][11]、[补充解释二][12]  
+有些 $ufunc$ 的确可以返回多个数组。$modf$ 就是一个例子，它是 $Python$ 内置函数 $divmod$ 的矢量化版本，它会返回浮点数数组的小数和整数部分：
+```py
+In [16]: arr = np.random.randn(7) * 5
 
+In [17]: arr
+Out[17]: array([-3.2623, -6.0915, -6.663 ,  5.3731,  3.6182,  3.45  ,  5.0077])
 
+In [18]: remainder, whole_part = np.modf(arr)
 
+In [19]: remainder
+Out[19]: array([-0.2623, -0.0915, -0.663 ,  0.3731,
+0.6182,  0.45  ,  0.0077])
 
+In [20]: whole_part
+Out[20]: array([-3., -6., -6.,  5.,  3.,  3.,  5.])
+```
+还有两个方法 $any$ 和 $all$，它们对布尔型数组非常有用。$any$ 用于测试数组中是否存在一个或多个 $True$，而 $all$ 则检查数组中所有值是否都是 $True$（两个方法也能用于非布尔型数组，所有非 $0$ 元素将会被当做 $True$）：
+```py
+In [21]: bools = np.array([False, False, True, False])
 
-对立事件：“$A$ 不发生”事件可以用 $A'$ 表示。$A'$ 被称为 $A$ 的对立事件。$A'$ 包含事件 $A$ 所不包含的任何事件。 $P(A') = 1 - P(A)$  
-互斥事件：如果两个事件是互斥事件，则只有其中一个事件会发生，这两个事件不会同时发生  
-相交事件：如果两个事件相交，则这两个事件有可能同时发生。$P(A∪B) = P(A) + P(B) - P(A∩B)$  
-$i\cap tersection$  
-$\;\; \updownarrow$  
-$\;\; \cup nion$  
+In [22]: bools.any()
+Out[22]: True
 
-
-全概率公式：$P(B) = P(A∩B) + P(A'∩B) = P(A) \times P(B|A) + P(A') \times P(B|A')$  
-
-贝叶斯定理：已知 <mark>$P(A)、P(B|A)、P(B|A')$</mark>，求$P(A|B)$。则 $P(A|B) = \cfrac{P(A∩B)}{P(B)} = \cfrac{P(A) \times P(B|A)}{P(A) \times P(B|A) + P(A') \times P(B|A')}$  
-
-相关事件：如果 $P(A|B)$ 不等于 $P(A)$，就说事件 $A$ 与事件 $B$ 的概率相互影响。
-
-独立事件：几个事件互相不影响。$P(A|B) = P(A)$，如果两个事件相互独立，则 $P(A|B) = P(A){\Rightarrow}P(A∩B)= P(A|B)P(B) = P(A)P(B)$
+In [23]: bools.all()
+Out[23]: False
+```
+$@$ 符也可以用作中缀运算符，进行矩阵乘法（[补充解释][13]）
+```py
+# 逆矩阵
+In [24]: inv(mat)
+# 矩阵 QR 分解
+In [25]: q, r = qr(mat)
+```
+$numpy.linalg$ 中有一组标准的矩阵分解运算以及诸如求逆和行列式之类的东西
+```py
+In [26]: import random
+  .....: position = 0
+  .....: walk = [position]
+  .....: steps = 1000
+  .....: for i in range(steps):
+  .....:     step = 1 if random.randint(0, 1) else -1
+  .....:     position += step
+  .....:     walk.append(position)
+```
 <br/><br/><br/>
 
 ## **第 05 章：$\textbf{pandas}$ 入门 $\textbf{Getting Started with pandas}$**
-离散型随机变量的期望：$E(X) = \sum xP(X=x)\small(注：E(X) = μ)$<!--空格：&nbsp;-->
+$Series$ 是一种类似于一维数组的对象，它由一组数据（各种 $NumPy$ 数据类型）以及一组与之相关的数据标签（即索引）组成。仅由一组数据即可产生最简单的 $Series$。$Series$ 的字符串表现形式为：索引在左边，值在右边。由于我们没有为数据指定索引，于是会自动创建一个 $0$ 到 $N-1$（$N$ 为数据的长度）的整数型索引。可以通过 $Series$ 的 $values$ 和 $index$ 属性获取其数组表示形式和索引对象
+```py
+In [1]: obj2 = pd.Series([4, 7, -5, 3], index=['d', 'b', 'a', 'c'])
 
-X 的函数的期望为：$E(f(X)) = \sum{f(x)P(X=x)}$
+In [2]: obj2
+Out[2]: 
+d    4
+b    7
+a   -5
+c    3
+dtype: int64
 
-离散型随机变量的方差：$Var(X) = E(X-μ)^2 = \sum (x-μ)²P(X=x)\small(注：E(X) = \sum xP(X=x))$  
+In [3]: obj2.index
+Out[3]: Index(['d', 'b', 'a', 'c'], dtype='object')
 
-离散型随机变量的标准差：$σ = \sqrt{Var(X)}$  
+In [4]: obj2['d'] = 6
+In [5]: obj2[['c', 'a', 'd']]
+Out[5]: 
+c    3
+a   -5
+d    6
+dtype: int64
+```
+如果数据被存放在一个 $Python$ 字典中，也可以直接通过这个字典来创建 $Series$：
+```py
+In [6]: sdata = {'Ohio': 35000, 'Texas': 71000, 'Oregon': 16000, 'Utah': 5000}
 
-线性变换的通用公式：<br/>
-期望：$E(aX+b) = aE(X) + b$  
-方差：$Var(aX+b) = a^2Var(X)$  
-$X$ 的 $n$ 个独立观测值的期望：$E(X_1+X_2+...X_n) = nE(X)$  
-$X$ 的 $n$ 个独立观测值的方差：$Var(X_1+X_2+...X_n) = nVar(X)$  
+In [7]: obj3 = pd.Series(sdata)
 
-随机变量加减计算：$\begin{cases}
-\footnotesize相加\begin{cases}
-\normalsize E(X+Y) = E(X) + E(Y)\\
-\normalsize Var(X+Y) = Var(X) + Var(Y)\footnotesize(注：方差加法仅适用于\colorbox{#FFFF00}{\textcolor{000000}{\normalsize独立随机变量}}\footnotesize，如果\ X\ 和\ Y\ 相互不独立，\normalsize Var(X+Y)\ne Var(X) + Var(Y))
-\end{cases}\\
-\footnotesize相减\begin{cases}
-\normalsize E(X-Y) = E(X) - E(Y)\\
-\normalsize Var(X-Y) = Var(X) + Var(Y)\footnotesize(注：若两个变量是\colorbox{#FFFF00}{\textcolor{000000}{\normalsize独立随机变量}}\footnotesize，将二者相减，\colorbox{#FFFF00}{\textcolor{000000}{\normalsize方差要相加}}\normalsize，\ Var(X-Y) = Var(X) + Var(Y))  
-\end{cases}
-\end{cases}$
+In [8]: obj3
+Out[8]: 
+Ohio      35000
+Oregon    16000
+Texas     71000
+Utah       5000
+dtype: int64
+```
+$DataFrame$ 是一个表格型的数据结构，它含有一组有序的列，每列可以是不同的值类型（数值、字符串、布尔值等）。$DataFrame$ 既有行索引也有列索引，它可以被看做由 $Series$ 组成的字典（共用同一个索引）。$DataFrame$ 中的数据是以一个或多个二维块存放的（而不是列表、字典或别的一维数据结构）
+与 $python$ 的集合不同，$pandas$ 的 $Index$ 可以包含重复的标签：
+```py
+In [9]: dup_labels = pd.Index(['foo', 'foo', 'bar', 'bar'])
 
-$aX$ 与 $bY$ 相加：
-$\begin{cases}
- E(aX+bY) = aE(X) + bE(Y)\\
- Var(aX+bY) = a^2Var(X) + b^2Var(Y)  
-\end{cases}$  
-$aX$ 与 $bY$ 相减：
-$\begin{cases}
- E(aX-bY) = aE(X) - bE(Y)\\
- Var(aX-bY) = a^2Var(X) + b^2Var(Y)  
-\end{cases}$
-<!--<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic011.png" width=60% />-->
+In [10]: dup_labels
+Out[10]: Index(['foo', 'foo', 'bar', 'bar'], dtype='object')
+```
+$pandas$ 对象的一个重要方法是 $reindex$，其作用是创建一个新对象，它的数据符合新的索引：
+```py
+In [11]: obj = pd.Series([4.5, 7.2, -5.3, 3.6], index=['d', 'b', 'a', 'c'])
+
+In [12]: obj
+Out[12]: 
+d    4.5
+b    7.2
+a   -5.3
+c    3.6
+dtype: float64
+
+In [13]: obj2 = obj.reindex(['a', 'b', 'c', 'd', 'e'])
+
+In [14]: obj2
+Out[14]: 
+a   -5.3
+b    7.2
+c    3.6
+d    4.5
+e    NaN
+dtype: float64
+```
+对于时间序列这样的有序数据，重新索引时可能需要做一些插值处理。$method$ 选项即可达到此目的，例如，使用 $ffill$ 可以实现前向值填充：
+```py
+In [15]: obj3 = pd.Series(['blue', 'purple', 'yellow'], index=[0, 2, 4])
+
+In [16]: obj3
+Out[16]: 
+0      blue
+2    purple
+4    yellow
+dtype: object
+
+In [17]: obj3.reindex(range(6), method='ffill')
+Out[17]: 
+0      blue
+1      blue
+2    purple
+3    purple
+4    yellow
+5    yellow
+dtype: object
+```
+借助 $DataFrame$，$reindex$ 可以修改（行）索引和列。只传递一个序列时，会重新索引结果的行（列可以用 $columns$ 关键字重新索引）：
+```py
+In [18]: frame = pd.DataFrame(np.arange(9).reshape((3, 3)),
+   ....:                      index=['a', 'c', 'd'],
+   ....:                      columns=['Ohio', 'Texas', 'California'])
+
+In [19]: frame
+Out[19]: 
+   Ohio  Texas  California
+a     0      1           2
+c     3      4           5
+d     6      7           8
+
+In [20]: frame2 = frame.reindex(['a', 'b', 'c', 'd'])
+
+In [21]: frame2
+Out[21]: 
+   Ohio  Texas  California
+a   0.0    1.0         2.0
+b   NaN    NaN         NaN
+c   3.0    4.0         5.0
+d   6.0    7.0         8.0
+
+In [22]: states = ['Texas', 'Utah', 'California']
+
+In [23]: frame.reindex(columns=states)
+Out[23]: 
+   Texas  Utah  California
+a      1   NaN           2
+c      4   NaN           5
+d      7   NaN           8
+```
+$Series$ 索引的工作方式类似于 $NumPy$ 数组的索引，只不过 $Series$ 的索引值不只是整数。下面是几个例子：
+```py
+In [24]: obj = pd.Series(np.arange(4.), index=['a', 'b', 'c', 'd'])
+
+In [25]: obj
+Out[25]: 
+a    0.0
+b    1.0
+c    2.0
+d    3.0
+dtype: float64
+
+In [26]: obj['b']
+Out[26]: 1.0
+
+In [27]: obj[1]
+Out[27]: 1.0
+
+In [28]: obj[2:4]
+Out[28]: 
+c    2.0
+d    3.0
+dtype: float64
+
+In [29]: obj[['b', 'a', 'd']]
+Out[29]:
+b    1.0
+a    0.0
+d    3.0
+dtype: float64
+
+In [30]: obj[[1, 3]]
+Out[30]: 
+b    1.0
+d    3.0
+dtype: float64
+
+In [31]: obj[obj < 2]
+Out[31]: 
+a    0.0
+b    1.0
+dtype: float64
+```
+利用标签的切片运算与普通的 $Python$ 切片运算不同，其末端是包含的：
+```py
+In [32]: obj['b':'c']
+Out[32]:
+b    1.0
+c    2.0
+dtype: float64
+```
+$pandas$ 最重要的一个功能是，它可以对不同索引的对象进行算术运算。在将对象相加时，如果存在不同的索引对，则结果的索引就是该索引对的并集。对于有数据库经验的用户，这就像在索引标签上进行自动外连接：
+```py
+In [33]: s1 = pd.Series([7.3, -2.5, 3.4, 1.5], index=['a', 'c', 'd', 'e'])
+In [34]: s2 = pd.Series([-2.1, 3.6, -1.5, 4, 3.1], index=['a', 'c', 'e', 'f', 'g'])
+In [35]: s1 + s2
+Out[35]: 
+a    5.2
+c    1.1
+d    NaN
+e    0.0
+f    NaN
+g    NaN
+dtype: float64
+```
+对于 $DataFrame$，对齐操作会同时发生在行和列上：
+```py
+In [36]: df1 = pd.DataFrame(np.arange(9.).reshape((3, 3)), columns=list('bcd'), index=['Ohio', 'Texas', 'Colorado'])
+
+In [37]: df2 = pd.DataFrame(np.arange(12.).reshape((4, 3)), columns=list('bde'), index=['Utah', 'Ohio', 'Texas', 'Oregon'])
+
+In [38]: df1
+Out[38]: 
+            b    c    d
+Ohio      0.0  1.0  2.0
+Texas     3.0  4.0  5.0
+Colorado  6.0  7.0  8.0
+
+In [39]: df2
+Out[39]: 
+          b     d     e
+Utah    0.0   1.0   2.0
+Ohio    3.0   4.0   5.0
+Texas   6.0   7.0   8.0
+Oregon  9.0  10.0  11.0
+
+In [40]: df1 + df2
+Out[40]: 
+            b   c     d   e
+Colorado  NaN NaN   NaN NaN
+Ohio      3.0 NaN   6.0 NaN
+Oregon    NaN NaN   NaN NaN
+Texas     9.0 NaN  12.0 NaN
+Utah      NaN NaN   NaN NaN
+```
+如果 $DataFrame$ 对象相加，没有共用的列或行标签，结果都会是空  
+在对不同索引的对象进行算术运算时，可能希望当一个对象中某个轴标签在另一个对象中找不到时填充一个特殊值（比如0）：
+```py
+In [41]: df1 = pd.DataFrame(np.arange(12.).reshape((3, 4)), columns=list('abcd'))
+
+In [42]: df2 = pd.DataFrame(np.arange(20.).reshape((4, 5)), columns=list('abcde'))
+
+In [43]: df2.loc[1, 'b'] = np.nan
+
+In [44]: df1
+Out[44]: 
+     a    b     c     d
+0  0.0  1.0   2.0   3.0
+1  4.0  5.0   6.0   7.0
+2  8.0  9.0  10.0  11.0
+
+In [45]: df2
+Out[45]: 
+      a     b     c     d     e
+0   0.0   1.0   2.0   3.0   4.0
+1   5.0   NaN   7.0   8.0   9.0
+2  10.0  11.0  12.0  13.0  14.0
+3  15.0  16.0  17.0  18.0  19.0
+
+In [46]: df1 + df2
+Out[46]: 
+      a     b     c     d   e
+0   0.0   2.0   4.0   6.0 NaN
+1   9.0   NaN  13.0  15.0 NaN
+2  18.0  20.0  22.0  24.0 NaN
+3   NaN   NaN   NaN   NaN NaN
+
+In [47]: df1.add(df2, fill_value=0)
+Out[47]: 
+      a     b     c     d     e
+0   0.0   2.0   4.0   6.0   4.0
+1   9.0   5.0  13.0  15.0   9.0
+2  18.0  20.0  22.0  24.0  14.0
+3  15.0  16.0  17.0  18.0  19.0
+```
+以字母 $r$ 开头，它会反转参数。因此这两个语句是等价的：
+```py
+In [48]: 1 / df1
+Out[48]: 
+          a         b         c         d
+0       inf  1.000000  0.500000  0.333333
+1  0.250000  0.200000  0.166667  0.142857
+2  0.125000  0.111111  0.100000  0.090909
+
+In [49]: df1.rdiv(1)
+Out[49]: 
+          a         b         c         d
+0       inf  1.000000  0.500000  0.333333
+1  0.250000  0.200000  0.166667  0.142857
+2  0.125000  0.111111  0.100000  0.090909
+
+# 与此类似，在对 Series 或 DataFrame 重新索引时，也可以指定一个填充值：
+In [50]: df1.reindex(columns=df2.columns, fill_value=0)
+Out[50]: 
+     a    b     c     d  e
+0  0.0  1.0   2.0   3.0  0
+1  4.0  5.0   6.0   7.0  0
+2  8.0  9.0  10.0  11.0  0
+```
 <br/><br/><br/>
 
-## **第 06 章：排列与组合 $\textbf{permutations and combinations}$：排序、排位、排 $\textbf{Making Arrangements}$**
-$n!-n$ $factorial-n$的阶乘  
-$n$ 个对象进行$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize线性方式}}$排位，数目共有$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize n!}} = n \times (n-1) \times (n-2)\cdots3 \times 2 \times 1$ 种  
-$n$ 个对象进行$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize圆形方式}}$排位，数目共有$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize (n-1)!}} = (n-1) \times (n-2)\cdots3 \times 2 \times 1$ 种  
+## **第 06 章：数据加载、存储与文件格式 $\textbf{Data Loading, Storage, and File Formats}$**
 
-按类型排位：如果要为 $n$ 个对象排位，其中包括第一类对象 $j$ 个，第二类对象 $k$ 个，第三类对象 $m$ 个……则可能的排位数目为 $\cfrac{n!}{j!k!m!\ldots}$  
-排列 $permutations$：从一个群体（$n$ 个）中选取几个对象（$r$ 个），在$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize考虑}}$这几个对象$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize顺序}}$的情况下，求出选取方式的数目。公式为：
-${^n}P{_r}/P{_n^r}/A{_n^r} = P(n,\ k) = \cfrac{{n!}}{(n-r)!}$  
-组合 $combinations$：从一个群体（$n$ 个）中选取几个对象（$r$ 个），在$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize不考虑}}$这几个对象$\colorbox{#FFFF00}{\textcolor{000000}{\normalsize顺序}}$的情况下，求出选取方式的数目。公式为：
-${^n}C{_r}/C{_n^r} = C(n,\ k) = \cfrac{{n!}}{r!(n-r)!}$
 <br/><br/><br/>
 
-## **第 07 章：几何分布、二项分布以及泊松分布 $\textbf{geometric, binomial, and poisson distributions}$：坚持离散 $\textbf{Keeping Things Discrete}$**
-$\colorbox{#FFFF00}{\textcolor{000000}{几何分布}}$ $geometric$ $distribution$：$X$~$Geo(p)$  
-$$
-\begin{align*}
-\footnotesize几何分布的条件：&①\footnotesize\ 进行一系列相互独立的实验\hspace{18cm}\\
-                            &②\footnotesize\ 每一次实验成败概率相同，成功概率为\normalsize \ p，\footnotesize失败概率为\normalsize \ q = 1-p\\
-                            &③\footnotesize\ 主要关注为取得第一次成功，需要进行的实验次数\\
-\end{align*}
-$$
-<!--几何分布的条件：$①$ 进行一系列相互独立的实验；$②$ 每一次实验成败概率相同，成功概率为 $p$，失败概率为 $q = 1-p$；$③$ 主要关注为取得第一次成功，需要进行的实验次数-->
-几何分布的概率算式，$\colorbox{yellow}{\textcolor{black}{在第 \(r\) 次实验取得第一次成功的概率}}$：$P(X=r) = pq^{r-1}$  
-实验 $r$ 次以上才能取得第一次成功的概率：$P(X>r) = q^r$  
-实验 $r$ 次或不到 $r$ 次即可取得第一次成功的概率：$P(X\leqslant{r}) = 1 - q^r$  
-几何分布的期望：$E(X) = \cfrac{1}{p}$ （[推导方法一][03]；[推导方法二][04]）  
-几何分布的方差：$Var(X) = \cfrac{q}{p^2}$ （[推导方法一][03]；[推导方法二][04]）
+## **第 07 章：数据清洗和准备 $\textbf{Data Cleaning and Preparation}$**
+
 <br/><br/><br/>
 
-$\colorbox{#FFFF00}{\textcolor{000000}{二项分布}}$ $binominal$ $distribution$：$X$~$B(n,p)$  
-$$
-\begin{align*}
-\footnotesize二项分布的条件：&①\footnotesize\ 进行一系列相互独立的实验\hspace{18cm}\\
-                            &②\footnotesize\ 每一次实验成败概率相同，成功概率为\normalsize \ p\footnotesize，失败概率为\normalsize \ 1-p\\
-                            &③\footnotesize\ 实验次数有限\\
-\end{align*}
-$$
-<!--二项分布的条件：$①$ 进行一系列相互独立的实验；$②$ 每一次实验成败概率相同，成功概率为 $p$，失败概率为 $1-p$；$③$ 实验次数有限-->
-二项分布和几何分布的情况一样，需要进行一系列独立实验，差别在于二项分布的关注点是获得成功的次数  
-根据 $n$ 与 $p$ 的不同数值，二项分布的形状会发生变化，$p$ 越接近 $0.5$，图形越对称。一般情况下，当 $p$ 小于 $0.5$ 时，图形向右偏斜；当 $p$ 大于 $0.5$ 时，图形向左偏斜  
-二项分布的概率算式，$\colorbox{yellow}{\textcolor{black}{取得 \(r\) 次成功的概率}}$：$P(X=r) = {^n}C{_r}p^{r}q^{n-r} = C{_n^r}p^{r}q^{n-r}\footnotesize——其中，\normalsize{^n}C{_r} = C{_n^r} = \cfrac{n!}{r!(n-r)!}$  
-二项分布的期望：$E(x) = np$ （[二项式定理解释一][05]、[解释二][06]；[推导方法一][07]；[推导方法二][08]）  
-二项分布的方差：$Var(x) = npq$ （[推导方法][09]）
+## **第 08 章：数据规整：聚合、合并和重塑 $\textbf{Data Wrangling: Join, Combine, and Reshape}$**
+
 <br/><br/><br/>
 
-$\colorbox{#FFFF00}{\textcolor{000000}{泊松分布}}$ $Poisson$ $distribution$：$X$~$Po(λ)$  
-$$
-\begin{align*}
-\footnotesize泊松分布的条件：&①\footnotesize\ 单独事件在给定区间内随机、独立地发生，给定区间可以是时间或空间\hspace{13cm}\\
-                            &②\footnotesize\ 已知该区间内的事件平均发生次数（或者叫做发生率），且为有限数值。该事件平均发生次数通常用\normalsize \ λ\ \footnotesize 表示\\
-\end{align*}
-$$
-<!--泊松分布条件：$①$ 单独事件在给定区间内随机、独立地发生，给定区间可以是时间或空间；$②$ 已知该区间内的事件平均发生次数（或者叫做发生率），且为有限数值。该事件平均发生次数通常用 $λ$ 表示-->
-泊松分布的形状随着 $λ$ 的数值发生变化。$λ$ 小，则分布向右偏斜，随着 $λ$ 变大，分布逐渐变得对称。如果 $λ$ 是一个整数，$λ$ 和 $λ-1$，如果 $λ$ 不是整数，则众数为 $λ$。  
-当二项分布的 $p$ 很小的时候，两者比较接近（[解释说明][10]）。泊松分布的概率算式，$\colorbox{yellow}{\textcolor{black}{求给定 \(T\) 时间段内发生 \(r\) 次事件的概率}}$：$P(X=r) = \cfrac{λ^r{e^{-λ}}}{r!}$ （[推导方法][11]）  
-泊松分布的期望：$E(x) = λ$ （[推导方法][12]）  
-泊松分布的方差：$Var(x) = λ$ （[推导方法][12]）  
-$\colorbox{#FFFF00}{\textcolor{000000}{当 \(n\) 很大且 \(p\) 很小时，可以用 \(X\!\sim \!Po(np)\) 近似代替 \(X\!\sim \!B(n,\ p)\)}}。$泊松分布的期望 $λ$，方差 $λ$；二项分布的期望 $np$，方差 $npq$。此时 $λ≈np$（当 $n$ 大于 $50$ 且 $p$ 小于 $0.1$ 时，为典型的近似情况）  
-当 $X$，$Y$ 都是独立随机变量，如果 $X$~$Po(λ_x)$，$Y$~$Po(λ_y)$，则可以等效于 $X+Y$~$Po(λ_x+λ_y)$。如果 $X$ 和 $Y$ 都符合泊松分布，则 $X+Y$ 也符合泊松分布。
-<!--<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic013.png" width=60% />-->
-$$
-\begin{align*}
-\footnotesize证明：
-&P(X+Y=n)\hspace{23cm}\\
-=&\sum_{k=0}^{n}{P(X=k,Y=n-k)}\\
-=&\sum_{k=0}^{n}{P(X=k)P(Y=n-k)}\\
-=&\sum_{k=0}^{n}\cfrac{{λ_x}^k}{k!}e^{-λ_x}\cfrac{{λ_y}^{n-k}}{{(n-k)}!}e^{-λ_y}\\
-=&\cfrac{1}{n!}e^{-(λ_x+λ_y)}\sum_{k=0}^{n}\cfrac{n!}{k!(n-k)!}{{λ_x}^k}{{λ_y}^{n-k}}\\
-=&\cfrac{1}{n!}e^{-(λ_x+λ_y)}\sum_{k=0}^{n}C{_n^k}{λ_x}^{k}{λ_y}^{n-k}\\
-=&\cfrac{{(λ_x+λ_y)}^{n}}{n!}e^{-(λ_x+λ_y)}\\
-\end{align*}
-$$
-$\therefore X+Y$~$Po(λ_x+λ_y)$
-<br/><br/><br/>
+## **第 09 章：绘图和可视化 $\textbf{Plotting and Visualization}$**
 
-## **第 08 章：正态分布的运用 $\textbf{using the normal distribution}：$保持正态 $\textbf{Being Normal}$**
-离散数据由单个数值组成。  
-连续数据包含一个数据范围，这个范围内的任何一个数值都有可能发生。  
-连续概率分布可以用概率密度函数进行描述。概率密度函数下方的总面积必须等于 1。  
-
-正态分布，也可被称作高斯分布，通过参数 $μ$ 和 $σ^2$ 进行定义。$μ$ 指出曲线的中央位置，$σ$ 指出分散性。如果一个连续随机变量 $X$ 符合均值为 $μ$，标准差为 $σ$ 的正态分布，则通常写作 $X{\sim}N(μ,\ σ^2)$。$μ$ 指出曲线的中央位置，$σ^2$ 指出分散性。$σ^2$ 越大，正态分布曲线越扁平、越宽。无论把图形画多大，概率密度永远不会等于 0。  
-<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic014.png" width=60% />
-$$
-\begin{align*}
-\footnotesize正态概率计算三步法：&①\footnotesize\ 确定分布与范围（确定\ \normalsize{N(μ,\ σ^2)}\ \footnotesize中的均值和标准差）；\hspace{14cm}\\
-                                &②\footnotesize\ 使其标准化（通过标准分\ \normalsize{z = \cfrac{x-μ}{σ}}\ \footnotesize，标准化为\ \normalsize{Z{\sim}N(0,\ 1)}\ \footnotesize）；\\
-                                &③\footnotesize\ 查找概率（用方便易用的概率表查找概率，查到\ \normalsize{P(Z<z)}\ \footnotesize的概率）\\
-\end{align*}
-$$
-延伸：  
-$①P(Z>z) = 1 - P(Z<z)\qquad ②P(a<Z<b)=P(Z<b) - P(Z<a)\\③\footnotesize正态分布概率密度函数\normalsize{\ probability\ density\ function(PDF)}{\footnotesize：}$
-<span style="background-color: #3794FF; display: inline-block;">$\textcolor{yellow}{f(x)=\cfrac{1}{\sqrt{2\pi}σ}\,e^{-\cfrac{(x-μ)^2}{2σ^2}}}$</span>  
-连续概率分布的众数即概率密度最大处的数值。如果画出概率密度，则众数为曲线最高点处的数值。正态分布的众数为 $μ$  
-连续概率分布的中位数即 $P(X<a) = 0.5$ 处的数值，即将概率密度曲线下方的面积一分为二的数值。正态分布的中位数为 $μ$  
-众数和中位数并不常用，期望和方差更为重要
-<br/><br/><br/>
-
-## **第 09 章：再谈正态分布的运用 $\textbf{using the normal distribution ii}$：超越正态 $\textbf{Beyond Normal}$**
-当随机变量 $X$ 和 $Y$ 相互独立时，可以利用 $X$ 和 $Y$ 的分布来计算 $Z = X + Y$ 的分布（[解释一][13]；[解释二][14]；[解释三][15]；[解释四][16]；[解释五][17]；[解释六][18]）。假设 $X$ 和 $Y$ 是相互独立的连续型随机变量，其密度函数分别为 $f_X$ 和 $f_Y$，那么 $X + Y$ 的累积分布函数 $\normalsize{cumulative\ distribution\ function(CDF)}$为：
-$$
-\begin{align*}
-F_{Z}(z)
-&=P\{Z\leq z\}=P\{X+Y\leq z\}=\iint\limits_{x+y\leq z}f(x,\ y)\mathrm{d}x\mathrm{d}y\\
-&=\int_{-\infty}^{\infty}\mathrm{d}x\int_{-\infty}^{z-x}f(x,\ y)\mathrm{d}y\xLeftrightarrow{等价于}\int_{-\infty}^{\infty}\left[\ \int_{-\infty}^{z-y}f(x,\ y)\mathrm{d}y\right]\mathrm{d}x\footnotesize\ 或者\normalsize \int_{-\infty}^{\infty}\mathrm{d}y\int_{-\infty}^{z-y}f(x,\ y)\mathrm{d}x\xLeftrightarrow{等价于}\int_{-\infty}^{\infty}\left[\ \int_{-\infty}^{z-y}f(x,\ y)\mathrm{d}x\right]\mathrm{d}y\tag{*}\\
-&=\int_{-\infty}^{\infty}\left[\int_{-\infty}^{z-y}f_(x,\ y)\mathrm{d}x\right]\mathrm{d}y\xlongequal[x+y\le\ z\ \to u\ \le\ z]{固定\ z\ 与\ y，令\ u\ =\ x\ +\ y}\int_{-\infty}^{\infty}\left[\int_{-\infty}^{z}f_(u-y,\ y)\mathrm{d}u\right]\mathrm{d}y=\int_{-\infty}^{z}\left[{\int_{-\infty}^{\infty}f_(u-y,\ y)\mathrm{d}y}\right]\mathrm{d}u=\int_{-\infty}^{z}{f_Z(u)}\mathrm{d}u\tag{**}\\
-&\therefore\
-{f_Z(z)=}
-\begin{cases}
-{\int_{-\infty}^{\infty}f(z-y,\ y)\mathrm{d}y}\\
-\footnotesize或者利用\ x，y\ 的对等性\\
-{\int_{-\infty}^{\infty}f(x,\ z-x)\mathrm{d}x}\\
-\end{cases}
-\xrightarrow{X\ 与\ Y\ 相互独立\to f(x,\ y)=f_x(x)f_y(y)}
-{f_Z(z)=}
-\begin{cases}
-{\int_{-\infty}^{\infty}f_X(z-y)f_Y(y)\mathrm{d}y}\\
-{\int_{-\infty}^{\infty}f_X(x)f_Y(z-x)\mathrm{d}x}\\
-\end{cases}
-\\
-&=\iint\limits_{x+y\leq z}f_X{(x)}f_Y{(y)}\mathrm{d}x\mathrm{d}y=\int_{-\infty}^{\infty}\int_{-\infty}^{z-y}f_X(x)f_Y(y)\mathrm{d}x\mathrm{d}y=\int_{-\infty}^{\infty}\left[\ \int_{-\infty}^{z-y}f_X(x)\mathrm{d}x\right]f_Y(y)\mathrm{d}y=\int_{-\infty}^{\infty}F_X(z-y)f_Y(y)\mathrm{d}y\tag{***}\\
-\end{align*}
-$$
-分布函数 $F_{Z}$ 称为分布函数 $F_X$ 和概率密度函数 $f_Y$ 的卷积 $convolution$。对 (***) 式求导，可得 $Z$ 的概率密度函数为：
-$$
-\begin{equation*}
-f_Z=\frac{\mathrm{d}}{\mathrm{d}z}\int_{-\infty}^{\infty}F_X(z-y)f_Y(y)\mathrm{d}y=\int_{-\infty}^{\infty}\frac{\mathrm{d}}{\mathrm{d}z}F_X(z-y)f_Y(y)\mathrm{d}y=\int_{-\infty}^{\infty}f_X(z-y)f_Y(y)\mathrm{d}y\\
-\end{equation*}
-$$  
-类似地，利用对等性，可得到 $f_Z(z)=\int_{-\infty}^{\infty}f_X(x)f_Y(z-x)\mathrm{d}x$。基于此，通过[具体证明步骤][19]可得出：当相互独立的随机变量 $X$ 和 $Y$ 都是正态分布时，  
-$$
-\begin{equation*}
-f_X(x)=N(x;\ μ_X,\ {σ_X}^2)=\cfrac{1}{\sqrt{2\pi}σ_X}\,e^{-\cfrac{(x-μ_X)^2}{2σ_X^2}}\\
-\end{equation*}\\
-\begin{equation*}
-f_Y(y)=N(y;\ μ_Y,\ {σ_Y}^2)=\cfrac{1}{\sqrt{2\pi}σ_Y}\,e^{-\cfrac{(x-μ_Y)^2}{2σ_Y^2}}\\
-\end{equation*}
-$$
-可以计算出：  
-$Z = X + Y$ 的概率密度函数如下
-$$
-\begin{equation*}
-f_Z(z)=N(z;\ μ_Z,\ {σ_Z}^2)=\cfrac{1}{\sqrt{2\pi}σ_Z}\,e^{-\cfrac{(x-μ_Z)^2}{2σ_Z^2}}{\footnotesize，其中\ \normalsize μ_Z = μ_X + μ_Y，σ_Z^2 = σ_X^2 + σ_Y^2}\\
-\end{equation*}
-$$
-$W = X - Y$ 的概率密度函数如下
-$$
-\begin{equation*}
-f_W(w)=N(w;\ μ_W,\ {σ_W}^2)=\cfrac{1}{\sqrt{2\pi}σ_W}\,e^{-\cfrac{(x-μ_W)^2}{2σ_W^2}}{\footnotesize，其中\ \normalsize μ_W = μ_X - μ_Y，σ_W^2 = σ_X^2 + σ_Y^2}\\
-\end{equation*}
-$$
-以上 $X+Y$ 和 $X-Y$ 两种情况可简略表述为：  
-<span style="background-color: #3794FF; display: block; text-align:center;">$\textcolor{yellow}{X+Y \sim N(μ_X+μ_Y,\ σ_X^2+σ_Y^2)}$</span>
-<span style="background-color: #3794FF; display: block; text-align:center;">$\textcolor{yellow}{X-Y \sim N(μ_X-μ_Y,\ σ_X^2+σ_Y^2)}$</span>
-<!--
-$$
-\begin{align*}
-%{X+Y \sim N(μ_X+μ_Y,\ σ_X^2+σ_Y^2)}\\
-%{X-Y \sim N(μ_X-μ_Y,\ σ_X^2+σ_Y^2)}\\
-\end{align*}
-$$
--->
-除此之外，$X+Y$ 和 $X-Y$ 图像的形状是一样的，这是因为方差相同（均为 $σ_X^2+σ_Y^2$）。但曲线的中心位置不同，这是因为均值不同（分别为 $μ_X+μ_Y$ 和 $μ_X-μ_Y$）  
-$$
-\begin{align*}
-\footnotesize如何计算\ X+Y\ \footnotesize的概率分布：&①\footnotesize\ 算出分布和范围\hspace{18cm}\\
-                                                    &②\footnotesize\ 将分布标准化\\
-                                                    &③\footnotesize\ 查找概率\\
-\end{align*}
-$$
-当 $X$~$N(μ,\ σ^2)$ 时（线性变换，$aX+b$ 类似 $4X,\ 4X+3$ 等。$a,\ b$ 都是数字），可以得到：<span style="background-color: #3794FF; display: inline-block;">$\textcolor{FFFF00}{aX+b\sim N(aμ+b,\ a^2σ^2)}$</span>  
-当 $X_n$~$N(μ,\ σ^2)$ 时，并且 $(X_1,\ X_2\ \cdots X_n)$ 均为 $X$ 的独立观察结果，可以得到：<span style="background-color: #3794FF; display: inline-block;">$\textcolor{FFFF00}{X_1+X_2+\cdots+X_n\sim N(nμ,\ nσ^2)}$</span>
-<br/><br/><br/>
-
-补充知识：二项式系数的[单峰性][20] $unimodality$ 及其证明  
-<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic015.png" width=60% />  
-在某些情况下，$\colorbox{yellow}{\textcolor{black}{泊松分布可以近似代替二项分布}}，$不过，在另一些情况下，$\colorbox{yellow}{\textcolor{black}{正态分布也可以近似代替二项分布}}$。如果符合二项分布 $X$~$B(n,\ p)$ 且 $np>5,\ nq>5$，则可以用正态分布 $X$~$N(np,\ npq)$ 近似代替二项分布（$μ=np$，$σ^2=npq$）。如果用正态分布近似代替二项分布，则需要进行$\colorbox{yellow}{\textcolor{black}{连续性修正 \(continuity\ correction\)}}$，才能确保得到正确的结果。
-$$
-\begin{align*}
-\footnotesize各种连续性修正：&①\footnotesize\le型概率：在一个连续标度上，离散数值\ a\ 会增长到\ (a+0.5)，实际需要计算\ P(X<a+0.5)\hspace{10cm}\\
-                            &②\footnotesize\ge型概率：在一个连续标度上，离散数值\ b\ 会减小到\ (b-0.5)，实际需要计算\ P(X>b-0.5)\\
-                            &③\footnotesize“介于型”概率：需要将两端的范围均扩展\ 0.5，需要求\ P(a-0.5<X<b+0.5)\\
-\end{align*}
-$$
-$\colorbox{yellow}{\textcolor{black}{正态分布也可以近似代替泊松分布}}$。如果符合泊松分布 $X$~$Po(λ)$ 且 $λ>15$，则可用正态分布 $X$~$N(λ,\ λ)$ 近似代替泊松分布（$μ=λ$，$σ^2=λ$）。根据书中例题，实际上，连续概率分布近似代替离散概率分布，都用到了连续性修正
 <br/><br/><br/>
 
 ## **第 10 章：统计抽样的运用 $\textbf{using statistical sampling}$：抽取样本 $\textbf{Taking Samples}$**
@@ -715,13 +843,13 @@ $y=a+bx$ 中的 $b$ 代表这条直线的斜率 $slope$，或称陡度 $steepnes
 [07]: https://www.runoob.com/python/python-func-map.html
 [08]: https://www.runoob.com/python/att-list-extend.html
 [09]: https://www.liaoxuefeng.com/wiki/1016959663602400/1017318207388128
+[10]: https://blog.csdn.net/u012762410/article/details/78912667
+[11]: https://cloud.tencent.com/developer/article/1796412
+[12]: https://cugtyt.github.io/blog/2017/10281314.html
+[13]: https://blog.nex3z.com/2017/07/23/numpy-%E4%B8%AD-ndarray-%E5%92%8C-matrix-%E7%9A%84%E5%8C%BA%E5%88%AB/
 
 
 
-[10]: https://www.zhihu.com/question/26441147/answer/429569625
-[11]: https://pangruitao.com/post/96
-[12]: https://blog.csdn.net/saltriver/article/details/52969014
-[13]: https://blog.nex3z.com/2019/01/19/probability-cheat-sheet-17/
 [14]: https://bingw.blog.csdn.net/article/details/53097048
 [15]: https://blog.csdn.net/andyjkt/article/details/108124198
 [16]: http://course.sdu.edu.cn/Download2/20150526151446004.pdf
