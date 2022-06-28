@@ -361,6 +361,7 @@ print(df.cumsum())
 # 对于非数值型数据，describe 会产生另外一种汇总统计
 print(pd.Series(['a', 'a', 'b', 'c'] * 4).describe())
 '''
+'''
 import pandas as pd
 import numpy as np
 
@@ -376,3 +377,271 @@ print(mask)
 data = pd.DataFrame({'Qu1': [1, 3, 4, 3, 4], 'Qu2': [2, 3, 1, 2, 3], 'Qu3': [1, 5, 2, 4, 4]})
 # 结果中的行标签是所有列的唯一值。后面的频率值是每个列中这些值的相应计数
 print(data.apply(pd.value_counts).fillna(0))
+'''
+'''
+import pandas as pd
+import numpy as np
+import os
+
+
+df = pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex1.csv')
+#print(os.getcwd())
+print(df)
+print(pd.read_table('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex1.csv', sep=','))
+print(pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex2.csv', header=None))
+print(pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex2.csv', names=['a', 'b', 'c', 'd', 'message']))
+# 将 message 列做成 DataFrame 的索引，可以通过 index_col 参数指定 "message"
+names = ['a', 'b', 'c', 'd', 'message']
+print(pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex2.csv', names=names, index_col='message'))
+# 将多个列做成一个层次化索引，只需传入由列编号或列名组成的列表即可
+print(pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/csv_mindex.csv', index_col=['key1', 'key2']))
+# 有些表格可能不是用固定的分隔符去分隔字段的
+print(list(open('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex3.txt')))
+# 这种情况下，可传递一个正则表达式作为 read_table 的分隔符
+print(pd.read_table('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex3.txt', sep='\s+'))
+# 比如说，可用 skiprows 跳过文件的第一行、第三行和第四行
+print(pd.read_table('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex4.csv', header=None))
+print(pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex4.csv', skiprows=[0, 2, 3]))
+# 缺失值处理
+print(pd.read_table('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex5.csv'))
+result = pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex5.csv')
+print(result)
+print(pd.isnull(result))
+data = pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex5.csv')
+print(data)
+data.to_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/out1.csv')
+print(pd.read_table('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/out1.csv', header=None))
+import sys
+data.to_csv(sys.stdout, sep='|')
+# 缺失值在输出结果中会被表示为空字符串。若要将其表示为别的标记值
+data.to_csv(sys.stdout, na_rep='NULL')
+'''
+'''
+os.system('type "D:\\Sharing\\Data_Science\\Books\\Python_for_Data_Analysis\\examples\\ex7.csv"')
+# 直接使用 Python 内置的 csv 模块
+import csv
+f = open('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex7.csv')
+reader = csv.reader(f)
+# 这个 reader 进行迭代将会为每行产生一个元组（并移除了所有的引号）
+for line in reader:
+    print(line)
+# 读取文件到一个多行的列表中
+with open('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex7.csv') as f:
+    lines = list(csv.reader(f))
+# 标题行+数据行
+header, values = lines[0], lines[1:]
+print(header)
+print(values)
+# 用字典构造式和 zip(*values)，后者将行转置为列，创建数据列的字典
+# https://www.runoob.com/python3/python3-func-zip.html
+data_dict = {h: v for h, v in zip(header, zip(*values))}
+print(data_dict)
+
+class my_dialect(csv.Dialect):
+    lineterminator = '\n'
+    delimiter = ';'
+    quotechar = '"'
+    quoting = csv.QUOTE_MINIMAL
+# 要手工输出分隔符文件，可使用 csv.writer
+with open('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/mydata.csv', 'w') as f:
+    writer = csv.writer(f, dialect=my_dialect)
+    writer.writerow(('one', 'two', 'three'))
+    writer.writerow(('1', '2', '3'))
+    writer.writerow(('4', '5', '6'))
+    writer.writerow(('7', '8', '9'))
+'''
+'''
+import pandas as pd
+import numpy as np
+import json
+
+obj = """
+{"name": "Wes",
+ "places_lived": ["United States", "Spain", "Germany"],
+ "pet": null,
+ "siblings": [{"name": "Scott", "age": 30, "pets": ["Zeus", "Zuko"]},
+              {"name": "Katie", "age": 38,
+               "pets": ["Sixes", "Stache", "Cisco"]}]
+}
+"""
+result = json.loads(obj)
+print(type(result))
+print(result)
+asjson = json.dumps(result)
+siblings = pd.DataFrame(result['siblings'], columns=['name', 'age'])
+print(siblings)
+# pandas.read_json 可自动将特别格式的 JSON 数据集转换为 Series 或 DataFrame
+import os
+os.system('type "D:\\Sharing\\Data_Science\\Books\\Python_for_Data_Analysis\\examples\\example.json"')
+data = pd.read_json('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/example.json')
+print(data)
+# 如果需要将数据从 pandas 输出到 JSON，可以使用 to_json 方法
+print(data.to_json())
+# orient：【string】，指示将要输出的 JSON 格式
+# 1) Series: 默认值为 'index'，允许的值为：{'split', 'records', 'index', 'table'}
+print(data.to_json(orient='records'))
+'''
+'''
+import pandas as pd
+import numpy as np
+
+tables = pd.read_html('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/fdic_failed_bank_list.html')
+print(len(tables))
+failures = tables[0]
+print(type(failures))
+# 显示所有列
+#pd.set_option('display.max_columns', None)
+print(failures.head())
+close_timestamps = pd.to_datetime(failures['Closing Date'])
+print(close_timestamps.dt.year.value_counts())
+'''
+'''
+import pandas as pd
+import numpy as np
+from lxml import objectify
+
+path = 'D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/datasets/mta_perf/Performance_MNR.xml'
+parsed = objectify.parse(open(path))
+root = parsed.getroot()
+
+data = []
+
+skip_fields = ['PARENT_SEQ', 'INDICATOR_SEQ',
+               'DESIRED_CHANGE', 'DECIMAL_PLACES']
+
+for elt in root.INDICATOR:
+    el_data = {}
+    for child in elt.getchildren():
+        if child.tag in skip_fields:
+            continue
+        el_data[child.tag] = child.pyval
+    data.append(el_data)
+
+#print(data)
+perf = pd.DataFrame(data)
+pd.set_option('display.max_columns', None)
+print(perf.head())
+
+from io import StringIO
+
+tag = '<a href="http://www.google.com">Google</a>'
+root = objectify.parse(StringIO(tag)).getroot()
+
+print(root.get('href'))
+print(root.text)
+'''
+'''
+import pandas as pd
+import numpy as np
+
+frame = pd.read_csv('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex1.csv')
+print(frame)
+frame.to_pickle('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/frame_pickle')
+print(pd.read_pickle('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/frame_pickle'))
+# pandas 或 NumPy 数据的其它存储格式有：
+# * bcolz：一种可压缩的列存储二进制格式，基于 Blosc 压缩库
+# * Feather：Wes McKinney 与 R 语言社区的 Hadley Wickham 设计的一种跨语言的列存储文件格式。Feather 使用了 Apache Arrow 的列式内存格式
+'''
+'''
+import pandas as pd
+import numpy as np
+
+xlsx = pd.ExcelFile('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/examples/ex1.xlsx')
+print(pd.read_excel(xlsx, 'Sheet1'))
+# 写入为 Excel 格式的简短介绍，使用 to_excel
+'''
+'''
+import pandas as pd
+import sqlite3
+
+query = """
+CREATE TABLE test
+(a VARCHAR(20), b VARCHAR(20),
+c REAL,        d INTEGER
+);"""
+con = sqlite3.connect('mydata.sqlite')
+#print(con.execute(query))
+con.commit()
+
+data = [('Atlanta', 'Georgia', 1.25, 6),
+        ('Tallahassee', 'Florida', 2.6, 3),
+        ('Sacramento', 'California', 1.7, 5)]
+stmt = "INSERT INTO test VALUES(?, ?, ?, ?)"
+print(con.executemany(stmt, data))
+cursor = con.execute('select * from test')
+rows = cursor.fetchall()
+print(rows)
+print(cursor.description)
+print(pd.DataFrame(rows, columns=[x[0] for x in cursor.description]))
+'''
+'''
+import pandas as pd
+import numpy as np
+
+string_data = pd.Series(['aardvark', 'artichoke', np.nan, 'avocado'])
+print(string_data)
+print(string_data.isnull())
+# Python 内置的 None 值在对象数组中也可以作为NA
+string_data[0] = None
+print(string_data.isnull())
+# 可通过 pandas.isnull 或布尔索引的手工方法，但 dropna 可能更实用一些。对于一个 Series，dropna 返回一个仅含非空数据和索引值的 Series
+data = pd.Series([1, np.nan, 3.5, np.nan, 7])
+print(data.dropna())
+print(data[data.notnull()])
+# DataFrame 的 dropna 默认丢弃任何含有缺失值的行
+data = pd.DataFrame([[1., 6.5, 3.], [1., np.nan, np.nan], [np.nan, np.nan, np.nan], [np.nan, 6.5, 3.]])
+cleaned = data.dropna()
+print(data)
+print(cleaned)
+# 传入 how='all' 将只丢弃全为 NA 的那些行
+print(data.dropna(how='all'))
+# 用这种方式丢弃列，只需传入 axis=1 即可
+data[4] = np.nan
+print(data)
+print(data.dropna(axis=1, how='all'))
+# 传入 thresh=n 保留至少有 n 个非 NaN 数据的行
+df = pd.DataFrame(np.random.randn(7, 3))
+df.iloc[:4, 1] = np.nan
+df.iloc[:2, 2] = np.nan
+print(df)
+print(df.dropna(thresh=2))
+# 通过一个常数调用 fillna 就会将缺失值替换为那个常数值
+print(df.fillna(0))
+# 若是通过一个字典调用 fillna，就可以实现对不同的列填充不同的值
+print(df.fillna({1: 0.5, 2: 0.1}))
+print(df)
+# fillna 默认会返回新对象，但也可以对现有对象进行就地修改
+df.fillna(0, inplace=True)
+print(df)
+'''
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame(np.random.randn(6, 3))
+df.iloc[2:, 1] = np.nan
+df.iloc[4:, 2] = np.nan
+print(df)
+# 用前面的值来填充
+print(df.fillna(method='ffill'))
+print(df.fillna(method='ffill', limit=2))
+# 还可往 fillna 中填其他东西，比如传入 Series 的平均值或中位数
+data = pd.Series([1., np.nan, 3.5, np.nan, 7])
+print(data.fillna(data.mean()))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -590,7 +590,14 @@ Out[50]:
 <br/><br/><br/>
 
 ## **第 06 章：数据加载、存储与文件格式 $\textbf{Data Loading, Storage, and File Formats}$**
-
+$pandas$ 提供了一些用于将表格型数据读取为 $DataFrame$ 对象的函数，$read\_csv$ 和 $read\_table$ 最为常用  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic004.png" width=60% />  
+$\begin{cases}
+Text\ Format(read\_csv,\ read\_table,\ to\_csv,\ JSON,\ XML/HTML)\\
+Binary\ Data\ Formats(pickle,\ HDF5,\ MS\ Excel)\\
+Web\ APIs(requests)\\
+Databases(SQLite)
+\end{cases}$
 <br/><br/><br/>
 
 ## **第 07 章：数据清洗和准备 $\textbf{Data Cleaning and Preparation}$**
