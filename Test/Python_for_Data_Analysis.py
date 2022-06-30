@@ -934,6 +934,7 @@ df1 = pd.DataFrame({'key': ['b', 'b', 'a', 'c', 'a', 'a', 'b'],
 df2 = pd.DataFrame({'key': ['a', 'b', 'd'],
                     'data2': range(3)})
 # 这是一种多对一的合并。df1 中的数据有多个被标记为 a 和 b 的行，而 df2 中 key 列的每个值则仅对应一行
+# merge 结果的显示顺序默认是按照 df1、df2 的行顺序进行显示
 print(pd.merge(df1, df2))
 print(pd.merge(df2, df1))
 # 没有指明要用哪个列进行连接。如果没有指定，merge 就会将重叠列的列名当做键
@@ -948,16 +949,25 @@ print(pd.merge(df3, df4, left_on='lkey', right_on='rkey'))
 # 其他方式还有"left"、"right"以及"outer"
 # 外连接求取的是键的并集，组合了左连接和右连接的效果
 print(pd.merge(df1, df2, how='outer'))
-
-
-
-
-
-
-
-
-
-
+df1 = pd.DataFrame({'key': ['b', 'b', 'a', 'c', 'a', 'b'],
+                    'data1': range(6)})
+df2 = pd.DataFrame({'key': ['a', 'b', 'a', 'b', 'd'],
+                    'data2': range(5)})
+# 多对多连接产生的是行的笛卡尔积。由于左边的 DataFrame 有 3 个"b"行，右边的有 2 个，所以最终结果中就有 6 个"b"行
+print(pd.merge(df1, df2, on='key', how='left'))
+print(pd.merge(df1, df2, how='inner'))
+left = pd.DataFrame({'key1': ['foo', 'foo', 'bar'],
+                     'key2': ['one', 'two', 'one'],
+                     'lval': [1, 2, 3]})
+right = pd.DataFrame({'key1': ['foo', 'foo', 'bar', 'bar'],
+                      'key2': ['one', 'one', 'one', 'two'],
+                      'rval': [4, 5, 6, 7]})
+print(left)
+print(right)
+print(pd.merge(left, right, on=['key1', 'key2'], how='outer'))
+# merge 有一个实用的 suffixes 选项，用于指定附加到左右两个 DataFrame 对象的重叠列名上的字符串
+print(pd.merge(left, right, on='key1'))
+print(pd.merge(left, right, on='key1', suffixes=('_left', '_right')))
 
 
 

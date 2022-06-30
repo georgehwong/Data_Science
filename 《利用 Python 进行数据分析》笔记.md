@@ -608,6 +608,10 @@ $\begin{cases}
 {\footnotesize数据转换}\\
 {\footnotesize字符串操作}\\
 \end{cases}$  
+<br/><br/><br/>
+
+## **第 08 章：数据规整：聚合、合并和重塑 $\textbf{Data Wrangling: Join, Combine, and Reshape}$**
+在许多应用中，数据可能分散在许多文件或数据库中，存储的形式也不利于分析。本章关注可以聚合、合并、重塑数据的方法  
 关于 $merge$ 的 $joim$ 用法的部分总结
 $$
 \begin{array}{l|l}
@@ -624,11 +628,8 @@ $$
 \end{array}
 \hspace{20cm}
 $$
-
-<br/><br/><br/>
-
-## **第 08 章：数据规整：聚合、合并和重塑 $\textbf{Data Wrangling: Join, Combine, and Reshape}$**
-在许多应用中，数据可能分散在许多文件或数据库中，存储的形式也不利于分析。本章关注可以聚合、合并、重塑数据的方法  
+$merge$ 函数的参数  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic005.png" width=60% />
 
 <br/><br/><br/>
 
