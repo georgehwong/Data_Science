@@ -596,15 +596,39 @@ $\begin{cases}
 Text\ Format(read\_csv,\ read\_table,\ to\_csv,\ JSON,\ XML/HTML)\\
 Binary\ Data\ Formats(pickle,\ HDF5,\ MS\ Excel)\\
 Web\ APIs(requests)\\
-Databases(SQLite)
+Databases(SQLite)\\
 \end{cases}$
 <br/><br/><br/>
 
 ## **第 07 章：数据清洗和准备 $\textbf{Data Cleaning and Preparation}$**
+在数据分析和建模的过程中，相当多的时间要用在数据准备上：加载、清理、转换以及重塑。这些工作会占到分析师时间的 $80\%$ 或更多。有时，存储在文件和数据库中的数据的格式不适合某个特定的任务。许多研究者都选择使用通用编程语言（如 $Python$、$Perl$、$R$ 或 $Java$）或 $UNIX$ 文本处理工具（如 $sed$ 或 $awk$）对数据格式进行专门处理。幸运的是，$pandas$ 和内置的 $Python$ 标准库提供了一组高级的、灵活的、快速的工具，可以让你轻松地将数据规整为想要的格式  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic005.png" width=60% />  
+$\begin{cases}
+{\footnotesize处理缺失数据}\\
+{\footnotesize数据转换}\\
+{\footnotesize字符串操作}\\
+\end{cases}$  
+关于 $merge$ 的 $joim$ 用法的部分总结
+$$
+\begin{array}{l|l}
+    \text{\footnotesize选项} & \text{\footnotesize说明}\\
+    \hline\\
+    inner & \footnotesize使用两个表都有的键\\
+    \hline\\
+    left & \footnotesize使用左表中所有的键\\
+    \hline\\
+    right & \footnotesize使用右表中所有的键\\
+    \hline\\
+    outer & \footnotesize使用两个表中所有的键\\
+    \hline\\
+\end{array}
+\hspace{20cm}
+$$
 
 <br/><br/><br/>
 
 ## **第 08 章：数据规整：聚合、合并和重塑 $\textbf{Data Wrangling: Join, Combine, and Reshape}$**
+在许多应用中，数据可能分散在许多文件或数据库中，存储的形式也不利于分析。本章关注可以聚合、合并、重塑数据的方法  
 
 <br/><br/><br/>
 
@@ -612,20 +636,8 @@ Databases(SQLite)
 
 <br/><br/><br/>
 
-## **第 10 章：统计抽样的运用 $\textbf{using statistical sampling}$：抽取样本 $\textbf{Taking Samples}$**
-总体 $population$：所研究的所有事物的集合  
+## **第 10 章：数据聚合与分组运算 $\textbf{Data Aggregation and Group Operations}$**
 
-样本 $sample$：从总体中选取的相对较小的集合，可用于做出关于总体本身的结论  
-
-偏倚 $biased$：如果样本不能代表目标总体，则这个样本存在~
-
-简单随机抽样 $simple\ random\ sampling$：随机选择抽样单位并形成样本，包括重复抽样和不重复抽样。具体方式包括抽签或使用随机编号生成器
-
-分层抽样 $stratified\ sampling$：将总体划分为几个组，或者叫做几个层，组或层中的单位都很相似，每一层都尽可能与其他层不一样（比如糖果按颜色分层），分层好以后，就对每一层执行简单随机抽样
-
-整群抽样 $cluster\ sampling$：将总体划分为几个群，其中每个群都尽量与其他群相似，可通过简单随机抽样抽取几个群，然后用这些群中的每一个抽样单位形成样本
-
-系统抽样 $systematic\ sampling$：选取一个数字 $K$，然后每到第 $K$ 个抽样单位就抽样一次
 <br/><br/><br/>
 
 ## **第 11 章：总体和样本的估计 $\textbf{estimating populations and samples}$：进行预测 $\textbf{Making Predictions}$**

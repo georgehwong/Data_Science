@@ -613,10 +613,6 @@ print(df)
 # fillna 默认会返回新对象，但也可以对现有对象进行就地修改
 df.fillna(0, inplace=True)
 print(df)
-'''
-import pandas as pd
-import numpy as np
-
 df = pd.DataFrame(np.random.randn(6, 3))
 df.iloc[2:, 1] = np.nan
 df.iloc[4:, 2] = np.nan
@@ -627,6 +623,332 @@ print(df.fillna(method='ffill', limit=2))
 # 还可往 fillna 中填其他东西，比如传入 Series 的平均值或中位数
 data = pd.Series([1., np.nan, 3.5, np.nan, 7])
 print(data.fillna(data.mean()))
+'''
+'''
+import pandas as pd
+import numpy as np
+
+data = pd.DataFrame({'k1': ['one', 'two'] * 3 + ['two'], 'k2': [1, 1, 2, 3, 3, 4, 4]})
+print(data)
+print(data.duplicated())
+data.drop_duplicates()
+data['v1'] = range(7)
+print(data)
+print(data.drop_duplicates(['k1']))
+# duplicated 和 drop_duplicates 默认保留的是第一个出现的值组合。传入 keep='last' 则保留最后一个
+print(data.drop_duplicates(['k1', 'k2'], keep='last'))
+data = pd.DataFrame({'food': ['bacon', 'pulled pork', 'bacon', 'Pastrami', 'corned beef', 'Bacon', 'pastrami', 'honey ham', 'nova lox'], 'ounces': [4, 3, 12, 6, 7.5, 8, 3, 5, 6]})
+print(data)
+meat_to_animal = {
+  'bacon': 'pig',
+  'pulled pork': 'pig',
+  'pastrami': 'cow',
+  'corned beef': 'cow',
+  'honey ham': 'pig',
+  'nova lox': 'salmon'
+}
+lowercased = data['food'].str.lower()
+data['animal'] = lowercased.map(meat_to_animal)
+print(data)
+# 也可以传入一个能够完成全部这些工作的函数
+# 使用 map 是一种实现元素级转换以及其他数据清理工作的便捷方式
+print(data['food'].map(lambda x: meat_to_animal[x.lower()]))
+data = pd.Series([1., -999., 2., -999., -1000., 3.])
+print(data)
+print(data.replace(-999, np.nan))
+print(data.replace([-999, -1000], np.nan))
+# 要让每个值有不同的替换值，可以传递一个替换列表
+print(data.replace([-999, -1000], [np.nan, 0]))
+# 传入的参数也可以是字典
+print(data.replace({-999: np.nan, -1000: 0}))
+'''
+'''
+import pandas as pd
+import numpy as np
+
+data = pd.DataFrame(np.arange(12).reshape((3, 4)), index=['Ohio', 'Colorado', 'New York'], columns=['one', 'two', 'three', 'four'])
+print(data)
+print(data.index.map(lambda x: x[:4].upper()))
+data.index = data.index.map(lambda x: x[:4].upper())
+print(data)
+# 创建数据集的转换版，而不是修改原始数据
+# 使用函数映射
+print(vars(data.index))
+print(data.rename(index=str.title, columns=str.upper))
+# rename 可以结合字典型对象实现对部分轴标签的更新
+print(data.rename(index={'OHIO': 'INDIANA'}, columns={'three': 'peekaboo'}))
+# 为了便于分析，连续数据常常被离散化或拆分为“面元”（bin）
+ages = [20, 22, 25, 27, 21, 23, 37, 31, 61, 45, 41, 32]
+bins = [18, 25, 35, 60, 100]
+cats = pd.cut(ages, bins)
+print(cats)
+print(cats.codes)
+print(cats.categories)
+print(pd.value_counts(cats))
+# 区间哪边是闭端可以通过 right=False 进行修改
+pd.cut(ages, [18, 26, 36, 61, 100], right=False)
+print(cats)
+# 可以通过传递一个列表或数组到 labels，设置面元名称
+group_names = ['Youth', 'YoungAdult', 'MiddleAged', 'Senior']
+print(pd.cut(ages, bins, labels=group_names))
+data = np.random.rand(20)
+print(pd.cut(data, 4, precision=2))
+# qcut 由于使用的是样本分位数，因此可以得到大小基本相等的面元
+data = np.random.randn(1000)  # Normally distributed
+cats = pd.qcut(data, 4)  # Cut into quartiles
+print(data.round(2))
+print(cats)
+print(pd.value_counts(cats))
+# 与 cut 类似，也可以传递自定义的分位数（ 0 到 1 之间的数值，包含端点）
+# 各个区间占有的份额：0.1, 0.4, 0.4, 0.1
+print(pd.qcut(data, [0, 0.1, 0.5, 0.9, 1.]))
+data = pd.DataFrame(np.random.randn(1000, 4))
+print(data.describe())
+# 找出某列中绝对值大小超过 3 的值
+col = data[2]
+print(col[np.abs(col) > 3])
+# 选出所有含“绝对值超过 3”的行，可在布尔型 DataFrame 中用 any 方法
+# any(1) 函数表示每行满足条件的返回布尔值
+print(data[(np.abs(data) > 3).any(1)])
+'''
+'''
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame(np.arange(5 * 4).reshape((5, 4)))
+sampler = np.random.permutation(5)
+print(sampler)
+print(df)
+# 对多维数组来说是多维随机打乱而不是一维
+print(df.take(sampler))
+# 若不想用替换的方式选随机子集，可在 Series 和 DataFrame 上用 sample 方法
+print(df.sample(n=3))
+# 要通过替换的方式产生样本（可重复选择），可传递 replace=True 到 sample
+choices = pd.Series([5, 7, -1, 6, 4])
+draws = choices.sample(n=10, replace=True)
+print(draws)
+'''
+'''
+import pandas as pd
+import numpy as np
+
+# 若 DataFrame 某一列含有 k 个不同值，则可派生出一个 k 列矩阵或 DataFrame（其值全为 1 和 0）
+df = pd.DataFrame({'key': ['b', 'b', 'a', 'c', 'a', 'b'], 'data1': range(6)})
+print(df)
+print(pd.get_dummies(df['key']))
+dummies = pd.get_dummies(df['key'], prefix='key')
+df_with_dummy = df[['data1']].join(dummies)
+print(df_with_dummy)
+mnames = ['movie_id', 'title', 'genres']
+movies = pd.read_table('D:/Sharing/Data_Science/Books/Python_for_Data_Analysis/datasets/movielens/movies.dat', sep='::', header=None, names=mnames)
+print(movies[:10])
+all_genres = []
+for x in movies.genres:
+    all_genres.extend(x.split('|'))
+genres = pd.unique(all_genres)
+#print(all_genres)
+# 从数据集中抽取出不同的 genre 值
+print(genres)
+# 构建指标 DataFrame 的方法之一是从一个全零 DataFrame 开始
+zero_matrix = np.zeros((len(movies), len(genres)))
+#print(zero_matrix)
+dummies = pd.DataFrame(zero_matrix, columns=genres)
+#print(dummies)
+print(movies.columns)
+gen = movies.genres[0]
+print(gen.split('|'))
+print(dummies.columns.get_indexer(gen.split('|')))
+for i, gen in enumerate(movies.genres):
+    indices = dummies.columns.get_indexer(gen.split('|'))
+    dummies.iloc[i, indices] = 1
+movies_windic = movies.join(dummies.add_prefix('Genre_'))
+pd.set_option('display.max_columns', None)
+print(movies_windic)
+
+values = np.random.rand(10)
+print(values)
+bins = [0, 0.2, 0.4, 0.6, 0.8, 1]
+print(pd.get_dummies(pd.cut(values, bins)))
+'''
+'''
+# 以逗号分隔的字符串可以用 split 拆分成数段
+val = 'a,b,  guido'
+print(val.split(','))
+
+# split 常常与 strip 一起使用，以去除空白符（包括换行符）
+pieces = [x.strip() for x in val.split(',')]
+print(pieces)
+# 利用加法，可以将这些子字符串以双冒号分隔符的形式连接起来
+first, second, third = pieces
+print(first + '::' + second + '::' + third)
+print('guido' in val)
+print(val.index(','))
+print(val.find(':'))
+# find 和 index 区别：若找不到字符串，index 将引发一个异常（而非返回 －1）
+#val.index(':')
+print(val.count(','))
+print(val.replace(',', '::'))
+print(val.replace(',', ''))
+'''
+'''
+import re
+import numpy as np
+import pandas as pd
+
+text = "foo    bar\t baz  \tqux"
+# 若要拆分一个字符串，分隔符为数量不定的一组空白符（制表符、空格、换行符等）
+# 描述一个或多个空白符的 regex 是 \s+
+print(re.split('\s+', text))
+# 可用 re.compile 自己编译 regex 以得到一个可重用的 regex 对象
+regex = re.compile('\s+')
+print(regex.split(text))
+# 若只希望得到匹配 regex 的所有模式，则可以使用 findall 方法
+print(regex.findall(text))
+# findall 返回的是字符串中所有的匹配项
+# search 只返回第一个匹配项
+# match 更加严格，只匹配字符串的首部
+text = """Dave dave@google.com
+Steve steve@gmail.com
+Rob rob@gmail.com
+Ryan ryan@yahoo.com
+"""
+pattern = r'[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}'
+# re.IGNORECASE makes the regex case-insensitive
+regex = re.compile(pattern, flags=re.IGNORECASE)
+print(regex.findall(text))
+# search 返回的是文本中第一个电子邮件地址（以特殊的匹配项对象形式返回）
+m = regex.search(text)
+print(m)
+print(text[m.start():m.end()])
+# regex.match 则将返回 None，因为它只匹配出现在字符串开头的模式
+print(regex.match(text))
+# 相关的，sub 方法可将匹配到的模式替换为指定字符串，并返回所得新字符串
+print(regex.sub('REDACTED', text))
+# 找出电子邮件地址，还想将各个地址分成3个部分：用户名、域名以及域后缀
+pattern = r'([A-Z0-9._%+-]+)@([A-Z0-9.-]+)\.([A-Z]{2,4})'
+regex = re.compile(pattern, flags=re.IGNORECASE)
+m = regex.match('wesm@bright.net')
+print(m.groups())
+# 对于带有分组功能的模式，findall 会返回一个元组列表
+print(regex.findall(text))
+# sub 还能通过诸如 \1、\2 之类的特殊符号访问各匹配项中的分组
+# 符号 \1 对应第一个匹配的组，\2 对应第二个匹配的组，以此类推
+print(regex.sub(r'Username: \1, Domain: \2, Suffix: \3', text))
+# 含有字符串的列有时还含有缺失数据
+data = {'Dave': 'dave@google.com', 'Steve': 'steve@gmail.com', 'Rob': 'rob@gmail.com', 'Wes': np.nan}
+data = pd.Series(data)
+print(data)
+print(data.isnull())
+print(data.str.contains('gmail'))
+#print(pattern)
+print(data.str.findall(pattern, flags=re.IGNORECASE))
+# 有两个办法可以实现矢量化的元素获取操作：
+# 要么使用 str.get，要么在 str 属性上使用索引
+matches = data.str.match(pattern, flags=re.IGNORECASE)
+print(matches)
+
+s = pd.Series(["String",
+              (1, 2, 3),
+              ["a", "b", "c"],
+              123,
+              -456,
+              {1: "Hello", "2": "World"}], index=['a', 'b', 'c', 'd', 'e', 'f'])
+print(type(s))
+print(s.str.get(1))
+
+s1 = pd.Series([True, True, True, np.nan], index=['Dave', 'Steve', 'Rob', 'Wes'])
+print(type(s1))
+#print(s1.str.get(1))
+'''
+#print(matches.str.get(1))
+#print(matches.str[0])
+#print(matches.apply(str).str.get(1))
+#print(matches.apply(str).str[0])
+'''
+print(data.str[:5])
+'''
+'''
+import numpy as np
+import pandas as pd
+
+data = pd.Series(np.random.randn(9),
+                 index=[['a', 'a', 'a', 'b', 'b', 'c', 'c', 'd', 'd'],
+                 [1, 2, 3, 1, 3, 1, 2, 2, 3]])
+print(data)
+print(data.index)
+print(data['b'])
+print(data['b':'c'])
+print(data.loc[['b', 'd']])
+# 有时甚至还可以在“内层”中进行选取
+print(data.loc[:, 2])
+# 层次化索引在数据重塑和基于分组的操作（如透视表生成）中扮演着重要的角色
+# 例如，可通过 unstack 方法将这段数据重新安排到一个 DataFrame 中
+print(data.unstack())
+# unstack 的逆运算是 stack
+print(data.unstack().stack())
+# 对于一个 DataFrame，每条轴都可以有分层索引
+frame = pd.DataFrame(np.arange(12).reshape((4, 3)),
+                     index=[['a', 'a', 'b', 'b'], [1, 2, 1, 2]],
+                     columns=[['Ohio', 'Ohio', 'Colorado'],
+                              ['Green', 'Red', 'Green']])
+print(frame)
+# 各层都可以有名字（可以是字符串，也可以是别的 Python 对象）
+# 如果指定了名称，它们就会显示在控制台输出中
+frame.index.names = ['key1', 'key2']
+frame.columns.names = ['state', 'color']
+print(frame)
+print(frame['Ohio'])
+# 可以单独创建 MultiIndex 然后复用
+# 上面那个 DataFrame 中的（带有分级名称）列可以这样创建
+print(pd.MultiIndex.from_arrays([['Ohio', 'Ohio', 'Colorado'], ['Green', 'Red', 'Green']], names=['state', 'color']))
+# swaplevel 接受两个级别编号或名称，并返回一个互换了级别的新对象（但数据不会发生变化）
+print(frame.swaplevel('key1', 'key2'))
+# sort_index 根据单个级别中的值对数据进行排序
+# 交换级别时，常常也会用到 sort_index
+print(frame)
+print(frame.sort_index(level=1))
+print(frame.swaplevel(0, 1).sort_index(level=0))
+# 许多对 DataFrame 和 Series 的描述汇总统计都有一个 level 选项，用于指定在某条轴上求和的级别
+#print(frame.sum(level='key2'))
+print(frame.groupby(level='key2').sum())
+#print(frame.sum(level='color', axis=1))
+print(frame.groupby(level='color', axis=1).sum())
+frame = pd.DataFrame({'a': range(7), 'b': range(7, 0, -1),
+                      'c': ['one', 'one', 'one', 'two', 'two',
+                            'two', 'two'],
+                      'd': [0, 1, 2, 0, 1, 2, 3]})
+print(frame)
+# DataFrame 的 set_index 函数会将其一个或多个列转换为行索引
+frame2 = frame.set_index(['c', 'd'])
+print(frame2)
+# 默认情况下，那些列会从 DataFrame 中移除，但也可以将其保留下来
+print(frame.set_index(['c', 'd'], drop=False))
+# reset_index 的功能跟 set_index 刚好相反，层次化索引的级别会被转移到列里面
+print(frame2.reset_index())
+'''
+import numpy as np
+import pandas as pd
+
+df1 = pd.DataFrame({'key': ['b', 'b', 'a', 'c', 'a', 'a', 'b'],
+                    'data1': range(7)})
+df2 = pd.DataFrame({'key': ['a', 'b', 'd'],
+                    'data2': range(3)})
+# 这是一种多对一的合并。df1 中的数据有多个被标记为 a 和 b 的行，而 df2 中 key 列的每个值则仅对应一行
+print(pd.merge(df1, df2))
+print(pd.merge(df2, df1))
+# 没有指明要用哪个列进行连接。如果没有指定，merge 就会将重叠列的列名当做键
+print(pd.merge(df1, df2, on='key'))
+# 如果两个对象的列名不同，也可以分别进行指定
+df3 = pd.DataFrame({'lkey': ['b', 'b', 'a', 'c', 'a', 'a', 'b'],
+                    'data1': range(7)})
+df4 = pd.DataFrame({'rkey': ['a', 'b', 'd'],
+                    'data2': range(3)})
+print(pd.merge(df3, df4, left_on='lkey', right_on='rkey'))
+# 默认情况下，merge 做的是“内连接”；结果中的键是交集
+# 其他方式还有"left"、"right"以及"outer"
+# 外连接求取的是键的并集，组合了左连接和右连接的效果
+print(pd.merge(df1, df2, how='outer'))
+
 
 
 
