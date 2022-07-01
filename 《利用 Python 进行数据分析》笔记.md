@@ -629,8 +629,12 @@ $$
 \hspace{20cm}
 $$
 $merge$ 函数的参数  
-<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic005.png" width=60% />
-
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic006.png" width=60% />  
+$\begin{cases}
+{\footnotesize层次化索引}\\
+{\footnotesize合并数据集}\\
+{\footnotesize重塑和轴向旋转}\\
+\end{cases}$
 <br/><br/><br/>
 
 ## **第 09 章：绘图和可视化 $\textbf{Plotting and Visualization}$**
