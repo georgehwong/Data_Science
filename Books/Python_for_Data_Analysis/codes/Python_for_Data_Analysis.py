@@ -1082,6 +1082,7 @@ print(df1)
 print(df2)
 print(df1.combine_first(df2))
 '''
+'''
 import numpy as np
 import pandas as pd
 
@@ -1155,12 +1156,256 @@ print(pd.melt(df, id_vars=['key'], value_vars=['A', 'B']))
 # 也可以不用分组指标
 print(pd.melt(df, value_vars=['A', 'B', 'C']))
 print(pd.melt(df, value_vars=['key', 'A', 'B']))
+'''
+'''
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
+data = np.arange(10)
+print(data)
+plt.plot(data)
+#plt.show()
 
+fig = plt.figure()
+# 这条代码的意思是：图像应该是 2×2 的（即最多 4 张图），且当前选中的是 4 个 subplot 中的第一个（编号从1开始）
+# 再把后面两个subplot也创建出来
+ax1 = fig.add_subplot(2, 2, 1)
+ax2 = fig.add_subplot(2, 2, 2)
+ax3 = fig.add_subplot(2, 2, 3)
+#plt.show()
+# 如果这时执行一条绘图命令（如 plt.plot([1.5, 3.5, -2, 1.6])），matplotlib 就会在最后一个用过的 subplot（如果没有则创建一个）上进行绘制，隐藏创建 figure 和 subplot 的过程
+plt.plot(np.random.randn(50).cumsum(), 'k--')
+#plt.show()
+ax1.hist(np.random.randn(100), bins=20, color='k', alpha=0.3)
+ax2.scatter(np.arange(30), np.arange(30) + 3 * np.random.randn(30))
+#plt.show()
 
+# 可以在 matplotlib 的文档中找到各种图表类型
+# 创建包含 subplot 网格的 figure 是一个非常常见的任务，matplotlib 有一个更为方便的方法 plt.subplots，它可以创建一个新的 Figure，并返回一个含有已创建的 subplot 对象的 NumPy 数组
+fig, axes = plt.subplots(2, 3)
+print(axes)
 
+# 默认情况下，matplotlib 会在 subplot 外围留下一定的边距，并在 subplot 之间留下一定的间距
+# 间距跟图像的高度和宽度有关，因此，若调整了图像大小（不管是编程还是手工），间距也会自动调整
+# 利用 Figure 的 subplots_adjust 方法可以轻而易举地修改间距，此外，它也是个顶级函数
+plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=None)
+#plt.show()
+# wspace 和 hspace 用于控制宽度和高度的百分比，可以用作 subplot 之间的间距
+# 下面是一个简单的例子，其中间距收缩到了0
+fig, axes = plt.subplots(2, 2, sharex=True, sharey=True)
+for i in range(2):
+    for j in range(2):
+        axes[i, j].hist(np.random.randn(500), bins=50, color='k', alpha=0.5)
+plt.subplots_adjust(wspace=0, hspace=0)
+#plt.show()
 
+# 要根据 x 和 y 绘制绿色虚线
+#ax.plot(x, y, 'g--')
+# 通过下面这种更为明确的方式也能得到同样的效果
+#ax.plot(x, y, linestyle='--', color='g')
 
+plt.figure()
+plt.plot(np.random.randn(30).cumsum(), 'go--')
+# k 是 black 简写
+plt.plot(np.random.randn(30).cumsum(), color='k', linestyle='dashed', marker='o')
+#plt.show()
 
+plt.figure()
+data = np.random.randn(30).cumsum()
+plt.plot(data, 'k--', label='Default')
+plt.plot(data, 'k-', drawstyle='steps-post', label='steps-post')
+plt.legend(loc='best')
+#plt.show()
 
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+ax.plot(np.random.randn(1000).cumsum())
+#plt.show()
+# 要改变 x 轴刻度，最简单的办法是使用 set_xticks 和 set_xticklabels
+ticks = ax.set_xticks([0, 250, 500, 750, 1000])
+# rotation 选项设定 x 刻度标签倾斜 30 度
+labels = ax.set_xticklabels(['one', 'two', 'three', 'four', 'five'],
+                            rotation=30, fontsize='small')
+ax.set_title('My first matplotlib plot')
+ax.set_xlabel('Stages')
+#plt.show()
+# 轴的类有集合方法，可以批量设定绘图选项
+props = {
+    'title': 'My first matplotlib plot',
+    'xlabel': 'Stages'
+}
+ax.set(**props)
+# 添加图例
+fig = plt.figure(); ax = fig.add_subplot(1, 1, 1)
+ax.plot(np.random.randn(1000).cumsum(), 'k', label='one')
+ax.plot(np.random.randn(1000).cumsum(), 'k--', label='two')
+ax.plot(np.random.randn(1000).cumsum(), 'k.', label='three')
+# 在此之后，可以调用 ax.legend() 或 plt.legend() 来自动创建图例
+ax.legend(loc='best')
+# 要从图例中去除一个或多个元素，不传入 label 或传入 label='nolegend' 即可
+#plt.show()
+
+# 注解以及在 Subplot 上绘图
+from datetime import datetime
+
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+
+data = pd.read_csv('../examples/spx.csv', index_col=0, parse_dates=True)
+spx = data['SPX']
+
+spx.plot(ax=ax, style='k-')
+
+crisis_data = [
+    (datetime(2007, 10, 11), 'Peak of bull market'),
+    (datetime(2008, 3, 12), 'Bear Stearns Fails'),
+    (datetime(2008, 9, 15), 'Lehman Bankruptcy')
+]
+
+for date, label in crisis_data:
+    ax.annotate(label, xy=(date, spx.asof(date) + 75),
+                xytext=(date, spx.asof(date) + 225),
+                arrowprops=dict(facecolor='black', headwidth=4, width=2,
+                                headlength=4),
+                horizontalalignment='left', verticalalignment='top')
+
+# Zoom in on 2007-2010
+ax.set_xlim(['1/1/2007', '1/1/2011'])
+ax.set_ylim([600, 1800])
+
+ax.set_title('Important dates in the 2008-2009 financial crisis')
+#plt.show()
+
+# 图形的绘制要麻烦一些。matplotlib 有一些表示常见图形的对象。这些对象被称为块（patch）
+# 其中有些（如 Rectangle 和 Circle），可以在 matplotlib.pyplot 中找到，但完整集合位于 matplotlib.patches
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+rect = plt.Rectangle((0.2, 0.75), 0.4, 0.15, color='k', alpha=0.3)
+circ = plt.Circle((0.7, 0.2), 0.15, color='b', alpha=0.3)
+pgon = plt.Polygon([[0.15, 0.15], [0.35, 0.4], [0.2, 0.6]],
+                   color='g', alpha=0.5)
+ax.add_patch(rect)
+ax.add_patch(circ)
+ax.add_patch(pgon)
+#plt.show()
+
+# 利用 plt.savefig 可以将当前图表保存到文件
+# 该方法相当于 Figure 对象的实例方法 savefig
+# 文件类型是通过文件扩展名推断出来的。因此，若使用的是 .pdf，就会得到一个 PDF 文件
+# 在发布图片时最常用到两个重要的选项是 dpi（控制“每英寸点数”分辨率）和 bbox_inches（可以剪除当前图表周围的空白部分）
+#plt.savefig('figpath.png', dpi=400, bbox_inches='tight')
+from io import BytesIO
+buffer = BytesIO()
+plt.savefig(buffer)
+plot_data = buffer.getvalue()
+#print(plot_data)
+# pyplot 使用 rc 配置文件来自定义图形的各种默认属性，被称为 rc 配置或 rc 参数
+# 在 pyplot 中几乎所有的默认属性都是可以控制的，例如视图窗口大小以及每英寸点数、线条宽度、颜色和样式、坐标轴、坐标和网格属性、文本、字体等
+plt.rc('figure', figsize=(10, 10))
+# https://www.ailibili.com/?p=481
+# monospace 是一种等宽字体：https://en.wikipedia.org/wiki/Monospaced_font
+font_options = {'family' : 'monospace',
+                'weight' : 'bold'}
+plt.rc('font', **font_options)
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+ax.plot(np.random.randn(1000).cumsum())
+ticks = ax.set_xticks([0, 250, 500, 750, 1000])
+labels = ax.set_xticklabels(['one', 'two', 'three', 'four', 'five'], rotation=30, fontsize='small')
+ax.set_title('My first matplotlib plot')
+ax.set_xlabel('Stages')
+plt.show()
+'''
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Series 和 DataFrame 都有一个用于生成各类图表的 plot 方法
+# 默认情况下，它们所生成的是线型图
+s = pd.Series(np.random.randn(10).cumsum(), index=np.arange(0, 100, 10))
+s.plot()
+#plt.show()
+df = pd.DataFrame(np.random.randn(10, 4).cumsum(0),
+                  columns=['A', 'B', 'C', 'D'],
+                  index=np.arange(0, 100, 10))
+df.plot()
+#plt.show()
+fig, axes = plt.subplots(2, 1)
+data = pd.Series(np.random.rand(16), index=list('abcdefghijklmnop'))
+# color='k' 和 alpha=0.7 设定了图形的颜色为黑色，并使用部分的填充透明度
+data.plot.bar(ax=axes[0], color='k', alpha=0.7)
+data.plot.barh(ax=axes[1], color='k', alpha=0.7)
+# 对于 DataFrame，柱状图会将每一行的值分为一组，并排显示
+df = pd.DataFrame(np.random.rand(6, 4),
+                  index=['one', 'two', 'three', 'four', 'five', 'six'],
+                  columns=pd.Index(['A', 'B', 'C', 'D'], name='Genus'))
+df.plot.bar()
+#plt.show()
+# 设置 stacked=True 即可为 DataFrame 生成堆积柱状图，这样每行的值就会被堆积在一起
+df.plot.barh(stacked=True, alpha=0.5)
+# 假设要做一张堆积柱状图以展示每天各种聚会规模的数据点的百分比
+# 用 read_csv 将数据加载进来，然后根据日期和聚会规模创建一张交叉表
+tips = pd.read_csv('../examples/tips.csv')
+party_counts = pd.crosstab(tips['day'], tips['size'])
+# Not many 1- and 6-person parties
+party_counts = party_counts.loc[:, 2:5]
+# 然后进行规格化，使得各行的和为 1，并生成图表
+# Normalize to sum to 1
+party_pcts = party_counts.div(party_counts.sum(1), axis=0)
+# 通过该数据集就可以看出，聚会规模在周末会变大
+party_pcts.plot.bar()
+#plt.show()
+# 对于在绘制一个图形之前，需要进行合计的数据，使用 seaborn 可以减少工作量
+import seaborn as sns
+fig = plt.figure()
+tips['tip_pct'] = tips['tip'] / (tips['total_bill'] - tips['tip'])
+print(tips.head())
+sns.barplot(x='tip_pct', y='day', data=tips, orient='h')
+# seaborn 的绘制函数使用 data 参数，它可能是 pandas 的 DataFrame
+# seaborn.barplot 有颜色选项，能够通过一个额外的值设置
+fig = plt.figure()
+# seaborn 已自动修改了图形的美观度：默认调色板，图形背景和网格线的颜色
+# 可以用 seaborn.set 在不同的图形外观之间切换
+sns.set(style="whitegrid")
+sns.barplot(x='tip_pct', y='day', hue='time', data=tips, orient='h')
+#plt.show()
+
+fig = plt.figure()
+tips['tip_pct'].plot.hist(bins=50)
+fig = plt.figure()
+tips['tip_pct'].plot.density()
+fig = plt.figure()
+comp1 = np.random.normal(0, 1, size=200)
+comp2 = np.random.normal(10, 2, size=200)
+values = pd.Series(np.concatenate([comp1, comp2]))
+#sns.distplot(values, bins=100, color='k')
+# 默认情况下，seaborn.histplot 的 kde 参数设置为 False
+# 因此，通过将 kde 设置为 True，计算核密度估计以平滑分布并绘制密度图线
+sns.histplot(values, bins=100, color='k', kde=True)
+#plt.show()
+
+fig = plt.figure()
+macro = pd.read_csv('../examples/macrodata.csv')
+data = macro[['cpi', 'm1', 'tbilrate', 'unemp']]
+trans_data = np.log(data).diff().dropna()
+print(trans_data[-5:])
+# 然后可使用 seaborn 的 regplot 方法，它可以做一个散布图，并加上一条线性回归的线
+# https://stackoverflow.com/questions/64130332/seaborn-futurewarning-pass-the-following-variables-as-keyword-args-x-y
+sns.regplot(x='m1', y='unemp', data=trans_data)
+plt.title('Changes in log %s versus log %s' % ('m1', 'unemp'))
+sns.pairplot(trans_data, diag_kind='kde', plot_kws={'alpha': 0.2})
+#plt.show()
+
+#sns.factorplot(x='day', y='tip_pct', hue='time', col='smoker',
+#               kind='bar', data=tips[tips.tip_pct < 1])
+sns.catplot(x='day', y='tip_pct', hue='time', col='smoker',
+            kind='bar', data=tips[tips.tip_pct < 1])
+# 除了在分面中用不同颜色按时间分组，还可通过给每个时间值添加一行来扩展分面网格
+sns.catplot(x='day', y='tip_pct', row='time', col='smoker',
+            kind='bar', data=tips[tips.tip_pct < 1])
+# 盒图（它可以显示中位数，四分位数，和异常值）就是一个有用的可视化类型
+sns.catplot(x='tip_pct', y='day', kind='box',
+            data=tips[tips.tip_pct < 0.5])
+plt.show()
 

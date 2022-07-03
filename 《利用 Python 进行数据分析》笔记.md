@@ -638,73 +638,35 @@ $\begin{cases}
 <br/><br/><br/>
 
 ## **第 09 章：绘图和可视化 $\textbf{Plotting and Visualization}$**
+$matplotlib$ 是一个用于创建出版质量图表的桌面绘图包（主要是 $2D$ 方面）。该项目是由 $John\ Hunter$ 于 $2002$ 年启动的，其目的是为 $Python$ 构建一个 $MATLAB$ 式的绘图接口。$matplotlib$ 和 $IPython$ 社区进行合作，简化了从 $IPython\ shell$（包括现在的 $Jupyter\ notebook$）进行交互式绘图。$matplotlib$ 支持各种操作系统上许多不同的 $GUI$ 后端，而且还能将图片导出为各种常见的矢量（$vector$）和光栅（$raster$）图：$PDF$、$SVG$、$JPG$、$PNG$、$BMP$、$GIF$ 等。除了几张，本书中的大部分图都是用它生成的  
+随着时间的发展，$matplotlib$ 衍生出了多个数据可视化的工具集，它们使用 $matplotlib$ 作为底层。其中之一是 [$seaborn$][14]，本章后面会学习它  
+$pyplot$ 接口的设计目的就是交互式使用，含有诸如 $xlim$、$xticks$ 和 $xticklabels$ 之类的方法。它们分别控制图表的范围、刻度位置、刻度标签等。其使用方式有以下两种：  
+* 调用时不带参数，则返回当前的参数值（例如，$plt.xlim()$ 返回当前的 $X$ 轴绘图范围）  
+* 调用时带参数，则设置参数值（例如，$plt.xlim([0,10])$ 会将 $X$ 轴的范围设置为 $0$ 到 $10$）
 
+$matplotlib$ 实际上是一种比较低级的工具。要绘制一张图表，你组装一些基本组件就行：数据展示（即图表类型：线型图、柱状图、盒形图、散布图、等值线图等）、图例、标题、刻度标签以及其他注解型信息。  
+在 $pandas$ 中，我们有多列数据，还有行和列标签。$pandas$ 自身就有内置的方法，用于简化从 $DataFrame$ 和 $Series$ 绘制图形。另一个库 [$seaborn$][14]，由 $Michael$ $Waskom$ 创建的静态图形库。$Seaborn$ 简化了许多常见可视类型的创建  
+$\begin{cases}
+{matplotlib\ API\ \footnotesize入门}\\
+{\footnotesize使用\ \normalsize{pandas}\ 和\ \normalsize{seaborn}\ \footnotesize绘图}\\
+{\footnotesize其它的\ \normalsize{Python}\footnotesize\ 可视化工具：如\ \normalsize{Boken,\ Plotly}\footnotesize\ 等}\\
+\end{cases}$
 <br/><br/><br/>
 
 ## **第 10 章：数据聚合与分组运算 $\textbf{Data Aggregation and Group Operations}$**
+本章中，会学到：  
+* 使用一个或多个键（形式可以是函数、数组或DataFrame列名）分割pandas对象
+* 计算分组的概述统计，比如数量、平均值或标准差，或是用户定义的函数
+* 应用组内转换或其他运算，如规格化、线性回归、排名或选取子集等
+* 计算透视表或交叉表
+* 执行分位数分析以及其它统计分组分析
+
+$Hadley\ Wickham$（许多热门 $R$ 语言包的作者）创造了一个用于表示分组运算的术语 $"split-apply-combine"$ （拆分－应用－合并）。第一个阶段，$pandas$ 对象（无论是 $Series$、$DataFrame$ 还是其他的）中的数据会根据你所提供的一个或多个键被拆分（$split$）为多组。拆分操作是在对象的特定轴上执行的。例如，$DataFrame$ 可以在其行（$axis=0$）或列（$axis=1$）上进行分组。然后，将一个函数应用（$apply$）到各个分组并产生一个新值。最后，所有这些函数的执行结果会被合并（$combine$）到最终的结果对象中。结果对象的形式一般取决于数据上所执行的操作
 
 <br/><br/><br/>
 
-## **第 11 章：总体和样本的估计 $\textbf{estimating populations and samples}$：进行预测 $\textbf{Making Predictions}$**
-点估计量 $poiint$ $estimator$ 由样本数据得出，是对总体参数 $population$ $parameter$ 的估计，$μ$ 是总体均值，$\hat{μ}$ 是 $μ$ 的点估计量。$\bar{x}$ 是样本均值
-$$
-\begin{equation*}
-{\footnotesize样本均值计算为\ }{\bar{x}=\cfrac{\sum x}{n}}{\footnotesize\ ，通过\ \normalsize \bar{x}\footnotesize\ 可得到总体均值的点估计量，即\ \normalsize \hat{μ}=\bar{x}}\\
-\end{equation*}
-$$
-$$
-\begin{equation*}
-{\footnotesize以样本数据估计总体方差\ }{s^2=\hat{σ}^2=\cfrac{\sum (x-\bar{x})^2}{n-1}}{\footnotesize\ ，总体方差点估计量的式子通常写作\ \normalsize s^2}\\
-\end{equation*}
-$$
-$$
-\begin{equation*}
-{\footnotesize总体成功比例的点估计量\rightarrow\ }{\hat{p}=p_s}{\footnotesize\ \leftarrow 样本成功比例，其中\ }{p_s=\cfrac{\footnotesize成功数目}{\footnotesize样本数目}}\\
-\end{equation*}
-$$
-<br/><br/><br/>
+## **第 11 章：时间序列 $\textbf{Time Series}$**
 
-$\colorbox{yellow}{\textcolor{black}{为样本比例计算概率}}$  
-计算样本比例本身的概率（样本比例的分布），即算出在一个整体中出现一种特定比例的概率——
-$$
-\begin{align*}
-\footnotesize 具体做法如下：&①\footnotesize\ 查看与特定样本大小相同的所有样本\hspace{17cm}\\
-                            &②\footnotesize\ 观察所有样本比例形成的分布，然后求出比例的期望和方差\\
-                            &③\footnotesize\ 得出上述比例的分布后，利用该分布求出概率\\
-\end{align*}
-$$
-考虑从同一个总体中取得的所有大小为 $n$ 的可能样本，由这些样本的比例形成一个分布，这就是“比例的抽样分布”。用 $P_s$ 代表样本比例随机变量  
-比例取决于样本中所选类型 $X$ 的数目（即成功数目，$X$ 的分布为二项分布，$X$~$B(n,\ p)$），其本身是一个随机变量，可以将此记为 $P_s$，则 $P_s=\cfrac{X}{n}$  
-<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic016.png" width=60% />  
-$P_s$ 的期望：$E(P_s) = E\left(\cfrac{X}{n}\right)=\cfrac{E(X)}{n}=\cfrac{np}{n}=p$  
-$P_s$ 的方差：$Var(P_s) = Var\left(\cfrac{X}{n}\right)=\cfrac{Var(X)}{n^2}=\cfrac{npq}{n^2}=\cfrac{pq}{n}$  
-比例标准误差 $standard$ $error$ $of$ $proportion$ $=P_s$ 的标准差 $=\sqrt{Var(P_s)}=\sqrt{\cfrac{pq}{n}}$（$n$ 越大，比例标准误差越小；即样本中包含的对象越多，用样本比例作为总体比例的估计量就越可靠）  
-如果 $n>30$，则 $P_s$ 符合正态分布，于是 $P_s$~$N(p,\ \cfrac{pq}{n})$，使用这个公式时需要进行连续性修正：$\pm\cfrac{1}{2n}$
-<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic017.png" width=60% />
-<br/><br/><br/>
-
-$\colorbox{yellow}{\textcolor{black}{为样本均值计算概率}}$  
-为了计算样本均值的概率，先要得出样本均值的概率分布——
-$$
-\begin{align*}
-\footnotesize 具体做法如下：&①\footnotesize\ 查看与所研究的样本大小相同的所有可能样本\hspace{16cm}\\
-                            &②\footnotesize\ 查看所有样本形成的分布，求出样本均值的期望和方差\\
-                            &③\footnotesize\ 得出样本均值的分布后，用该分布求出概率\\
-\end{align*}
-$$
-考虑从同一个总体中取得的所有大小为 $n$ 的可能样本，由这些样本的均值形成一个分布，这就是“均值的抽样分布”。用 $\bar{X}$ 代表样本均值随机变量  
-<img src="https://raw.githubusercontent.com/georgehwong/Statistics/main/Pics/Pic018.png" width=60% />  
-$\bar{X}$ 的期望：$E(\bar{X})=E(\cfrac{X_1+X_2+\cdots+X_n}{n})=\cfrac{1}{n}E(X_1+X_2+\cdots+X_n)=\cfrac{1}{n}\left[E(X_1)+E(X_2)+\cdots+E(X_n)\right]=\cfrac{1}{n}\left[μ+μ+\cdots+μ\right]=\cfrac{1}{n}(nμ)=μ$  
-$\bar{X}$ 的方差：$Var(\bar{X})=Var(\cfrac{X_1+X_2+\cdots+X_n}{n})=\cfrac{1}{n^2}\left[Var(X_1)+Var(X_2)+\cdots+Var(X_n)\right]=\cfrac{1}{n^2}\left[σ^2+σ^2+\cdots+σ^2\right]=\cfrac{1}{n^2}(nσ^2)=\cfrac{σ^2}{n}$  
-均值标准误差 $standard$ $error$ $of$ $the$ $mean$ $=\bar{X}$ 的标准差 $=\sqrt{Var(\bar{X})}=\cfrac{σ}{\sqrt{n}}$（$n$ 越大，均值标准误差越小；即样本中包含的个体越多，用样本均值作为总体均值的估计量就越可靠）  
-如果 $X$~$N(μ,\ σ^2)$，则 $\bar{X}$~$N(μ,\ \cfrac{σ^2}{n})$；如果 $X$ 不符合正态分布，但 $n$ 足够大，仍可用正态分布近似，用正态分布求 $\bar{X}$ 的概率，也被称为“中心极限定理”  
-中心极限定理 $central$ $limit$ $theorem$：如果从一个非正态总体 $X$ 中抽取一个样本，且样本很大，则 $\bar{X}$ 的分布近似为正态分布，当总体的均值和方差为 $μ$ 和 $σ^2$，且 $n$ 很大（比如大于 $30$），那么 $\bar{X}$~$N(μ,\ \cfrac{σ^2}{n})$，更具体一些：  
-$$
-\begin{align*}
-{\footnotesize X\ 满足二项分布（而且其中\ n>30）时\ X \sim B(n,\ p)\rightarrow\bar{X} \sim N(np,\ pq)}\\
-{\footnotesize X\ 满足泊松分布（而且其中\ n>30）时\ X \sim Po(λ)\rightarrow\bar{X} \sim N(λ, \cfrac{λ}{n})}\\
-\end{align*}
-$$
 <br/><br/><br/>
 
 ## **第 12 章：置信区间的构建 $\textbf{constructing confidence intervals}$：自信地猜测 $\textbf{Guessing with Confidence}$**
@@ -871,10 +833,10 @@ $y=a+bx$ 中的 $b$ 代表这条直线的斜率 $slope$，或称陡度 $steepnes
 [11]: https://cloud.tencent.com/developer/article/1796412
 [12]: https://cugtyt.github.io/blog/2017/10281314.html
 [13]: https://blog.nex3z.com/2017/07/23/numpy-%E4%B8%AD-ndarray-%E5%92%8C-matrix-%E7%9A%84%E5%8C%BA%E5%88%AB/
+[14]: http://seaborn.pydata.org/
 
 
 
-[14]: https://bingw.blog.csdn.net/article/details/53097048
 [15]: https://blog.csdn.net/andyjkt/article/details/108124198
 [16]: http://course.sdu.edu.cn/Download2/20150526151446004.pdf
 [17]: https://wulc.me/2016/10/08/%E6%A6%82%E7%8E%87%E8%AE%BA%E4%B8%8E%E6%95%B0%E7%90%86%E7%BB%9F%E8%AE%A1%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86(2)--%E4%BA%8C%E7%BB%B4%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F%E7%9A%84%E5%88%86%E5%B8%83/
