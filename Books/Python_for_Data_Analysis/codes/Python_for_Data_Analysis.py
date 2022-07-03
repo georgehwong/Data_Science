@@ -1317,6 +1317,7 @@ ax.set_title('My first matplotlib plot')
 ax.set_xlabel('Stages')
 plt.show()
 '''
+'''
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -1408,4 +1409,6 @@ sns.catplot(x='day', y='tip_pct', row='time', col='smoker',
 sns.catplot(x='tip_pct', y='day', kind='box',
             data=tips[tips.tip_pct < 0.5])
 plt.show()
-
+'''
+import numpy as np
+import pandas as pd

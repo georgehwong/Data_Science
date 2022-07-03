@@ -8,3 +8,5 @@ git status
 git add *
 git commit -m "upload notes"
 git push origin master
+
+git lfs clone https://github.com/georgehwong/Data_Science.git

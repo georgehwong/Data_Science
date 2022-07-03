@@ -661,7 +661,8 @@ $\begin{cases}
 * 计算透视表或交叉表
 * 执行分位数分析以及其它统计分组分析
 
-$Hadley\ Wickham$（许多热门 $R$ 语言包的作者）创造了一个用于表示分组运算的术语 $"split-apply-combine"$ （拆分－应用－合并）。第一个阶段，$pandas$ 对象（无论是 $Series$、$DataFrame$ 还是其他的）中的数据会根据你所提供的一个或多个键被拆分（$split$）为多组。拆分操作是在对象的特定轴上执行的。例如，$DataFrame$ 可以在其行（$axis=0$）或列（$axis=1$）上进行分组。然后，将一个函数应用（$apply$）到各个分组并产生一个新值。最后，所有这些函数的执行结果会被合并（$combine$）到最终的结果对象中。结果对象的形式一般取决于数据上所执行的操作
+$Hadley\ Wickham$（许多热门 $R$ 语言包的作者）创造了一个用于表示分组运算的术语 $"split-apply-combine"$ （拆分－应用－合并）。第一个阶段，$pandas$ 对象（无论是 $Series$、$DataFrame$ 还是其他的）中的数据会根据你所提供的一个或多个键被拆分（$split$）为多组。拆分操作是在对象的特定轴上执行的。例如，$DataFrame$ 可以在其行（$axis=0$）或列（$axis=1$）上进行分组。然后，将一个函数应用（$apply$）到各个分组并产生一个新值。最后，所有这些函数的执行结果会被合并（$combine$）到最终的结果对象中。结果对象的形式一般取决于数据上所执行的操作  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic007.png" width=60% />  
 
 <br/><br/><br/>
 
