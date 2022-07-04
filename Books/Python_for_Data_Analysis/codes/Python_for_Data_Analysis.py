@@ -1410,5 +1410,90 @@ sns.catplot(x='tip_pct', y='day', kind='box',
             data=tips[tips.tip_pct < 0.5])
 plt.show()
 '''
+'''
 import numpy as np
 import pandas as pd
+
+df = pd.DataFrame({'key1' : ['a', 'a', 'b', 'b', 'a'],
+                   'key2' : ['one', 'two', 'one', 'two', 'one'],
+                   'data1' : np.random.randn(5),
+                   'data2' : np.random.randn(5)})
+print(df)
+# 访问 data1，并根据 key1 调用 groupby
+grouped = df['data1'].groupby(df['key1'])
+print(grouped.mean())
+# 如果一次传入多个数组的列表，就会得到不同的结果
+means = df['data1'].groupby([df['key1'], df['key2']]).mean()
+print(means)
+means.unstack()
+# 分组键可以是任何长度适当的数组
+states = np.array(['Ohio', 'California', 'California', 'Ohio', 'Ohio'])
+years = np.array([2005, 2005, 2006, 2005, 2006])
+print(df['data1'].groupby([states, years]).mean())
+# 通常，分组信息就位于相同的要处理 DataFrame 中
+# 这里，还可以将列名（可以是字符串、数字或其他 Python 对象）用作分组键
+print(df.groupby('key1').mean())
+print(df.groupby(['key1', 'key2']).mean())
+print(df.groupby(['key1', 'key2']).size())
+# GroupBy 对象支持迭代，可以产生一组二元元组（由分组名和数据块组成）
+for name, group in df.groupby('key1'):
+    print(name)
+    print(group)
+# 对于多重键的情况，元组的第一个元素将会是由键值组成的元组
+for (k1, k2), group in df.groupby(['key1', 'key2']):
+    print((k1, k2))
+    print(group)
+# 将这些数据片段做成一个字典
+pieces = dict(list(df.groupby('key1')))
+print(pieces['b'])
+# groupby 默认是在 axis=0 上进行分组的，通过设置也可以在其他任何轴上进行分组
+print(df.dtypes)
+grouped = df.groupby(df.dtypes, axis=1)
+for dtype, group in grouped:
+    print(dtype)
+    print(group)
+print(df.groupby('key1')['data1'])
+print(df.groupby('key1')[['data2']])
+print(df['data1'].groupby(df['key1']))
+print(df[['data2']].groupby(df['key1']))
+print(df.groupby(['key1', 'key2'])[['data2']].mean())
+s_grouped = df.groupby(['key1', 'key2'])['data2']
+print(s_grouped)
+print(s_grouped.mean())
+'''
+import numpy as np
+import pandas as pd
+
+people = pd.DataFrame(np.random.randn(5, 5),
+                      columns=['a', 'b', 'c', 'd', 'e'],
+                      index=['Joe', 'Steve', 'Wes', 'Jim', 'Travis'])
+print(people)
+# Add a few NA values
+people.iloc[2:3, [1, 2]] = np.nan
+print(people)
+# 假设已知列的分组关系，并希望根据分组计算列的和
+mapping = {'a': 'red', 'b': 'red', 'c': 'blue',
+           'd': 'blue', 'e': 'red', 'f' : 'orange'}
+by_column = people.groupby(mapping, axis=1)
+print(by_column.sum())
+# Series 也有同样的功能，它可以被看做一个固定大小的映射
+map_series = pd.Series(mapping)
+print(map_series)
+print(people.groupby(map_series, axis=1).count())
+# 可以计算一个字符串长度的数组，更简单的方法是传入 len 函数
+print(people.groupby(len).sum())
+key_list = ['one', 'one', 'one', 'two', 'two']
+print(people.groupby([len, key_list]).min())
+columns = pd.MultiIndex.from_arrays([['US', 'US', 'US', 'JP', 'JP'],
+                                    [1, 3, 5, 1, 3]],
+                                    names=['cty', 'tenor'])
+hier_df = pd.DataFrame(np.random.randn(4, 5), columns=columns)
+print(hier_df)
+print(hier_df.groupby(level='cty', axis=1).count())
+
+
+
+
+
+
+
