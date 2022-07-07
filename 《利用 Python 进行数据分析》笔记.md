@@ -665,84 +665,14 @@ $Hadley\ Wickham$（许多热门 $R$ 语言包的作者）创造了一个用于�
 <img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic007.png" width=60% />  
 聚合指的是任何能够从数组产生标量值的数据转换过程。之前的例子已经用过一些，比如 $mean$、$count$、$min$ 以及 $sum$ 等。可能想知道在 $GroupBy$ 对象上调用 $mean()$ 时究竟发生了什么。如下，许多常见的聚合运算都有进行优化  
 <img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic008.png" width=60% />  
-
 <br/><br/><br/>
 
 ## **第 11 章：时间序列 $\textbf{Time Series}$**
 
 <br/><br/><br/>
 
-## **第 12 章：置信区间的构建 $\textbf{constructing confidence intervals}$：自信地猜测 $\textbf{Guessing with Confidence}$**
-$$
-\begin{align*}
-\footnotesize 求解置信区间的步骤：&①\footnotesize\ 选择总体统计量\hspace{19cm}\\
-                                &②\footnotesize\ 求出所选统计量的抽样分布\\
-                                &③\footnotesize\ 决定置信水平\\
-                                &④\footnotesize\ 求出置信上下限\\
-\end{align*}
-$$
-置信区间简便算法：
-$$
-\begin{array}{c} % 总表格
-    \begin{array}{l|l|l|l|l}
-        \text{\footnotesize总体统计量} & \text{\footnotesize总体分布} & \text{\footnotesize条件} & \text{\footnotesize置信区间}\\
-        \hline\\
-        μ & \footnotesize正态 & {\begin{aligned}&\footnotesize σ^2\ 已知\\&\footnotesize n\ 可大可小\\&\footnotesize \bar{x}\ 为样本均值\end{aligned}} & \left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right) \\
-        \hline\\
-        μ & \footnotesize非正态 & {\begin{aligned}&σ^2\ \footnotesize 已知\\&n\ \footnotesize 很大（至少\ \normalsize 30）\\&\bar{x}\ \footnotesize 为样本均值\end{aligned}} & \left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right) \\
-        \hline\\
-        μ & \footnotesize正态或非正态 & {\begin{aligned}&σ^2\ \footnotesize 未知\\&n\ \footnotesize 很大（至少\ \normalsize 30）\\&\bar{x}\ \footnotesize 为样本均值\\&s^2\ \footnotesize 为样本方差\end{aligned}} & \left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right) \\
-        \hline\\
-        p & \footnotesize二项 & {\begin{aligned}&n\ \footnotesize 很大\\&p_s\ \footnotesize 为样本比例\\&q_s=1-p_s\end{aligned}} & \left(p_s-c\sqrt{\cfrac{p_sq_s}{n}},\ p_s+c\sqrt{\cfrac{p_sq_s}{n}}\right) \\
-        \hline\\
-    \end{array}
-    &
-    \begin{array}{l|l}
-        \text{\footnotesize置信水平} & \text{C\ \footnotesize 值}\\
-        \hline\\
-        \text{90\%} & \text{1.64}\\
-        \hline\\
-        \text{95\%} & \text{1.96}\\
-        \hline\\
-        \text{99\%} & \text{2.58}\\
-    \end{array}
-\end{array}
-$$
+## **第 12 章：$\textbf{pandas}$ 高级应用 $\textbf{Advanced pandas}$**
 
-<!--<style>table{margin: auto; border: 1px solid #b9b9b9;}</style>-->
-<!--
-<style>
-    table {
-        margin: auto; 
-        border-style: solid;
-    }
-    td, th {
-        border-style: solid;
-    }
-</style>
-| Table 1 | Table 2 |
-| -- | -- |
-| <table><tr><th>总体统计量</th><th>总体分布</th><th>条件</th><th>置信区间</th></tr><tr><td>$μ$</td><td>正态</td><td>$σ^2$ 已知<br>n 可大可小<br>$\bar{x}$ 为样本均值</td><td>$\left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right)$</td></tr><tr><td>$μ$</td><td>非正态</td><td>$σ^2$ 已知<br>n 很大（至少 $30$）<br>$\bar{x}$ 为样本均值</td><td>$\left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right)$</td></tr><tr><td>$μ$</td><td>正态或非正态</td><td>$σ^2$ 未知<br>n 很大（至少 $30$）<br>$\bar{x}$ 为样本均值<br>$s^2$ 为样本方差</td><td>$\left(\bar{x}-c\cfrac{s}{\sqrt{n}},\ \bar{x}+c\cfrac{s}{\sqrt{n}}\right)$</td></tr><tr><td>$p$</td><td>二项</td><td>$n$ 很大<br>$p_s$ 为样本比例<br>$q_s=1-p_s$</td><td>$\left(p_s-c\sqrt{\cfrac{p_sq_s}{n}},\ p_s+c\sqrt{\cfrac{p_sq_s}{n}}\right)$</td></tr></table> | <table><tr><th>置信水平</th><th>C 值</th></tr><tr><td>90%</td><td>1.64</td></tr><tr><td>95%</td><td>1.96</td></tr><tr><td>99%</td><td>2.58</td></tr></table> |
--->
-<!--
----
-| 总体统计量 | 总体分布 | 条件 | 置信区间 |
-| :- | :- | :- | :- |
-| μ | 正态 | $σ^2$ 已知<br>n 可大可小<br>$\bar{x}$ 为样本均值 | $\left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right)$ |
-| μ | 非正态 | $σ^2$ 已知<br>n 很大（至少 $30$）<br>$\bar{x}$ 为样本均值 | $\left(\bar{x}-c\cfrac{σ}{\sqrt{n}},\ \bar{x}+c\cfrac{σ}{\sqrt{n}}\right)$ |
-| μ | 正态或非正态 | $σ^2$ 未知<br>n 很大（至少 $30$）<br>$\bar{x}$ 为样本均值<br>$s^2$ 为样本方差 | $\left(\bar{x}-c\cfrac{s}{\sqrt{n}},\ \bar{x}+c\cfrac{s}{\sqrt{n}}\right)$ |
-| p | 二项 | $n$ 很大<br>$p_s$ 为样本比例<br>$q_s=1-p_s$ | $\left(p_s-c\sqrt{\cfrac{p_sq_s}{n}},\ p_s+c\sqrt{\cfrac{p_sq_s}{n}}\right)$ |
----
-| 置信水平 | C 值 |
-| :- | :-|
-| 90% | 1.64 |
-| 95% | 1.96 |
-| 99% | 2.58 |
--->
-一般情况下，置信区间的计算式为：<span style="background-color: #3794FF; display: inline-block;">$\textcolor{yellow}{统计量\pm (误差范围)}$</span>。误差范围等于 $c$ 与检验统计量的标准差的乘积：<span style="background-color: #3794FF; display: inline-block;">$\textcolor{yellow}{误差范围 =c\times(统计量的标准差)}$</span>
-
-$t$ 分布的标准分的算式：$T=\cfrac{\bar{X}-μ}{s/\sqrt{n}}$  
-$t$ 分布的置信上下限：$\left(\bar{x}-t(v)\cfrac{s}{\sqrt{n}},\ \bar{x}+t(v)\cfrac{s}{\sqrt{n}}\right)$ （总体统计量：$μ$——总体分布：$\underset{\sim}{\footnotesize正}\underset{\sim}{\footnotesize态}$或$\underset{\sim}{\footnotesize非}\underset{\sim}{\footnotesize正}\underset{\sim}{\footnotesize态}$——条件：$\underline{σ^2\ \footnotesize未知}+\underline{n\ \footnotesize很小<小于\normalsize\ 30\footnotesize >}+\underline{\bar{x}\ \footnotesize为样本均值}+\underline{s^2\ \footnotesize为样本方差}$。为了求出 $t(v)$，需要查找 $t$ 分布概率表，为此，用 $v=n-1$ 和确定下来的置信水平求出置信区间）
 <br/><br/><br/>
 
 ## **第 13 章：假设检验的运用 $\textbf{using hypothesis tests}$：研究证据 $\textbf{Look At The Evidence}$**

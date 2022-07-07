@@ -1460,9 +1460,6 @@ print(df.groupby(['key1', 'key2'])[['data2']].mean())
 s_grouped = df.groupby(['key1', 'key2'])['data2']
 print(s_grouped)
 print(s_grouped.mean())
-'''
-import numpy as np
-import pandas as pd
 
 people = pd.DataFrame(np.random.randn(5, 5),
                       columns=['a', 'b', 'c', 'd', 'e'],
@@ -1490,10 +1487,185 @@ columns = pd.MultiIndex.from_arrays([['US', 'US', 'US', 'JP', 'JP'],
 hier_df = pd.DataFrame(np.random.randn(4, 5), columns=columns)
 print(hier_df)
 print(hier_df.groupby(level='cty', axis=1).count())
+print(df)
+grouped = df.groupby('key1')
+print(grouped.apply(lambda a: a[:]))
+print(grouped.apply(lambda a: a.drop('key1', axis=1)[:]))
+# https://blog.csdn.net/u012510648/article/details/96117627
+# pos = 1 + (3 - 1) * 0.9 = 2.8, (a3 - a2) * 0.8 + a2
+print(grouped['data1'].quantile(0.9))
+# 如果要使用自己的聚合函数，只需将其传入 aggregate 或 agg 方法即可
+def peak_to_peak(arr):
+    return arr.max() - arr.min()
+# https://www.oreilly.com/catalog/errata.csp?isbn=0636920386926
+#print(grouped.agg(peak_to_peak))
+print(df.loc[:, ['key1', 'data1', 'data2']].groupby('key1').agg(peak_to_peak))
+pd.set_option('display.max_columns', None)
+print(grouped.describe())
+tips = pd.read_csv('../examples/tips.csv')
+# Add tip percentage of total bill
+tips['tip_pct'] = tips['tip'] / tips['total_bill']
+print(tips[:6])
+grouped = tips.groupby(['day', 'smoker'])
+grouped_pct = grouped['tip_pct']
+print(grouped_pct.agg('mean'))
+# 如果传入一组函数或函数名，得到的 DataFrame 的列就会以相应的函数命名
+print(grouped_pct.agg(['mean', 'std', peak_to_peak]))
+functions = ['count', 'mean', 'max']
+result = grouped['tip_pct', 'total_bill'].agg(functions)
+print(result)
+print(result['tip_pct'])
+# 跟前面一样，这里也可以传入带有自定义名称的一组元组
+ftuples = [('Durchschnitt', 'mean'), ('Abweichung', np.var)]
+print(grouped['tip_pct', 'total_bill'].agg(ftuples))
+# 假设想要对一个列或不同的列应用不同的函数
+# 具体的办法是向 agg 传入一个从列名映射到函数的字典
+print(grouped.agg({'tip' : np.max, 'size' : 'sum'}))
+print(grouped.agg({'tip_pct' : ['min', 'max', 'mean', 'std'], 'size' : 'sum'}))
+print(tips.groupby(['day', 'smoker'], as_index=False).mean())
+# 最通用的 GroupBy 方法是 apply
+def top(df, n=5, column='tip_pct'):
+    return df.sort_values(by=column)[-n:]
+print(top(tips, n=6))
+# 如果对 smoker 分组并用该函数调用 apply，就会得到
+print(tips.groupby('smoker').apply(top))
+# 如果传给 apply 的函数能够接受其他参数或关键字，则可以将这些内容放在函数名后面一并传入
+print(tips.groupby(['smoker', 'day']).apply(top, n=1, column='total_bill'))
+result = tips.groupby('smoker')['tip_pct'].describe()
+print(result)
+print(result.unstack())
+pd.set_option('display.max_rows', None)
+f = lambda x: x.describe()
+print(grouped.apply(f))
+# 从上面例子可看出，分组键会跟原始对象的索引共同构成结果对象中的层次化索引
+# 将 group_keys=False 传入 groupby 即可禁止该效果
+print(tips.groupby('smoker', group_keys=False).apply(top))
+frame = pd.DataFrame({'data1': np.random.randn(1000),
+                      'data2': np.random.randn(1000)})
+quartiles = pd.cut(frame.data1, 4)
+print(quartiles[:10])
+# 由 cut 返回的 Categorical 对象可直接传递到 groupby
+# 因此，可以像下面这样对 data2 列做一些统计计算
+def get_stats(group):
+    return {'min': group.min(), 'max': group.max(),
+            'count': group.count(), 'mean': group.mean()}
+grouped = frame.data2.groupby(quartiles)
+print(grouped.apply(get_stats).unstack())
+# 以上为长度相等的桶。要根据样本分位数得到大小相等的桶，使用 qcut 即可
+# Return quantile numbers
+grouping = pd.qcut(frame.data1, 10, labels=False)
+grouped = frame.data2.groupby(grouping)
+print(grouped.apply(get_stats).unstack())
+'''
+'''
+import numpy as np
+import pandas as pd
 
+s = pd.Series(np.random.randn(6))
+s[::2] = np.nan
+print(s)
+print(s.fillna(s.mean()))
+states = ['Ohio', 'New York', 'Vermont', 'Florida',
+          'Oregon', 'Nevada', 'California', 'Idaho']
+group_key = ['East'] * 4 + ['West'] * 4
+data = pd.Series(np.random.randn(8), index=states)
+print(data)
+data[['Vermont', 'Nevada', 'Idaho']] = np.nan
+print(data)
+print(data.groupby(group_key).mean())
+# 可以用分组平均值去填充 NA 值
+fill_mean = lambda g: g.fillna(g.mean())
+print(data.groupby(group_key).apply(fill_mean))
+# 由于分组具有一个 name 属性，所以可以拿来用一下
+fill_values = {'East': 0.5, 'West': -1}
+fill_func = lambda g: g.fillna(fill_values[g.name])
+print(data.groupby(group_key).apply(fill_func))
+'''
+import numpy as np
+import pandas as pd
 
+# Hearts, Spades, Clubs, Diamonds
+suits = ['H', 'S', 'C', 'D']
+card_val = (list(range(1, 11)) + [10] * 3) * 4
+#print(card_val)
+base_names = ['A'] + list(range(2, 11)) + ['J', 'K', 'Q']
+#print(base_names)
+cards = []
+for suit in ['H', 'S', 'C', 'D']:
+    cards.extend(str(num) + suit for num in base_names)
+deck = pd.Series(card_val, index=cards)
+print(deck[:13])
+def draw(deck, n=5):
+    return deck.sample(n)
+print(draw(deck))
+get_suit = lambda card: card[-1] # last letter is suit
+print(deck.groupby(get_suit).apply(draw, n=2))
+# 也可以这样写
+print(deck.groupby(get_suit, group_keys=False).apply(draw, n=2))
 
+df = pd.DataFrame({'category': ['a', 'a', 'a', 'a',
+                                'b', 'b', 'b', 'b'],
+                   'data': np.random.randn(8),
+                   'weights': np.random.rand(8)})
+print(df)
+grouped = df.groupby('category')
+get_wavg = lambda g: np.average(g['data'], weights=g['weights'])
+print(grouped.apply(get_wavg))
+close_px = pd.read_csv('../examples/stock_px_2.csv', parse_dates=True,
+                       index_col=0)
+print(close_px.info())
+print(close_px[-4:])
+spx_corr = lambda x: x.corrwith(x['SPX'])
+rets = close_px.pct_change().dropna()
+get_year = lambda x: x.year
+by_year = rets.groupby(get_year)
+print(by_year.apply(spx_corr))
+print(by_year.apply(lambda g: g['AAPL'].corr(g['MSFT'])))
 
+import statsmodels.api as sm
 
+def regress(data, yvar, xvars):
+    Y = data[yvar]
+    X = data[xvars]
+    X['intercept'] = 1.
+    result = sm.OLS(Y, X).fit()
+    return result.params
+print(by_year.apply(regress, 'AAPL', ['SPX']))
+tips = pd.read_csv('../examples/tips.csv')
+print(tips.pivot_table(index=['day', 'smoker']))
+tips['tip_pct'] = tips['tip'] / (tips['total_bill'] - tips['tip'])
+print(tips.pivot_table(['tip_pct', 'size'], index=['time', 'day'], columns='smoker'))
+# 传入 margins=True 添加分项小计
+# 这将会添加标签为 All 的行和列，其值对应于单个等级中所有数据的分组统计
+print(tips.pivot_table(['tip_pct', 'size'], index=['time', 'day'], columns='smoker', margins=True))
+# 使用 count 或 len 可以得到有关分组大小的交叉表（计数或频率）
+print(tips.pivot_table('tip_pct', index=['time', 'smoker'],
+    columns='day', aggfunc=len, margins=True))
+print(tips.pivot_table('tip_pct', index=['time', 'size', 'smoker'],
+    columns='day', aggfunc='mean', fill_value=0))
 
+#from io import StringIO
 
+#data = """\
+#Sample  Nationality  Handedness
+#1   USA  Right-handed
+#2   Japan    Left-handed
+#3   USA  Right-handed
+#4   Japan    Right-handed
+#5   Japan    Left-handed
+#6   Japan    Right-handed
+#7   USA  Right-handed
+#8   USA  Left-handed
+#9   Japan    Right-handed
+#10  USA  Right-handed"""
+#data = pd.read_table(StringIO(data), sep='\s+')
+data = pd.DataFrame({'Sample': range(1, 11),
+                     'Nationality': ['USA', 'Japan', 'USA', 'Japan',
+                     'Japan', 'Japan', 'USA', 'USA', 'Japan', 'USA'],
+                     'Handedness': ['Right-handed', 'Left-handed',
+                     'Right-handed', 'Right-handed', 'Left-handed',
+                     'Right-handed', 'Right-handed', 'Left-handed',
+                     'Right-handed', 'Right-handed']})
+print(data)
+print(pd.crosstab(data.Nationality, data.Handedness, margins=True))
+print(pd.crosstab([tips.time, tips.day], tips.smoker, margins=True))
