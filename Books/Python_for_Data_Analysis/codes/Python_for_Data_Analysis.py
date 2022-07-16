@@ -1581,6 +1581,7 @@ fill_values = {'East': 0.5, 'West': -1}
 fill_func = lambda g: g.fillna(fill_values[g.name])
 print(data.groupby(group_key).apply(fill_func))
 '''
+'''
 import numpy as np
 import pandas as pd
 
@@ -1669,3 +1670,36 @@ data = pd.DataFrame({'Sample': range(1, 11),
 print(data)
 print(pd.crosstab(data.Nationality, data.Handedness, margins=True))
 print(pd.crosstab([tips.time, tips.day], tips.smoker, margins=True))
+'''
+import numpy as np
+import pandas as pd
+from datetime import datetime
+
+now = datetime.now()
+print(now)
+print(now.year, now.month, now.day)
+delta = datetime(2011, 1, 7) - datetime(2008, 6, 24, 8, 15)
+print(delta)
+print(delta.days)
+print(delta.seconds)
+from datetime import timedelta
+start = datetime(2011, 1, 7)
+print(start + timedelta(12))
+print(start - 2 * timedelta(12))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

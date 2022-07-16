@@ -665,10 +665,22 @@ $Hadley\ Wickham$（许多热门 $R$ 语言包的作者）创造了一个用于�
 <img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic007.png" width=60% />  
 聚合指的是任何能够从数组产生标量值的数据转换过程。之前的例子已经用过一些，比如 $mean$、$count$、$min$ 以及 $sum$ 等。可能想知道在 $GroupBy$ 对象上调用 $mean()$ 时究竟发生了什么。如下，许多常见的聚合运算都有进行优化  
 <img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic008.png" width=60% />  
+$\begin{cases}
+{GroupBy\ \footnotesize机制}\\
+{\footnotesize数据聚合}\\
+{apply\footnotesize：一般性的“拆分－应用－合并”}\\
+{\footnotesize透视表和交叉表}\\
+\end{cases}$
 <br/><br/><br/>
 
 ## **第 11 章：时间序列 $\textbf{Time Series}$**
+时间序列数据的意义取决于具体的应用场景，主要有以下几种：  
+* 时间戳（$timestamp$），特定的时刻
+* 固定时期（$period$），如 $2007$ 年 $1$ 月或 $2010$ 年全年
+* 时间间隔（$interval$），由起始和结束时间戳表示。时期（$period$）可以被看做间隔（interval）的特例
+* 实验或过程时间，每个时间点都是相对于特定起始时间的一个度量。例如，从放入烤箱时起，每秒钟饼干的直径
 
+本章主要讲解前 $3$ 种时间序列。许多技术都可用于处理实验型时间序列，其索引可能是一个整数或浮点数（表示从实验开始算起已经过去的时间）。最简单也最常见的时间序列都是用时间戳进行索引的
 <br/><br/><br/>
 
 ## **第 12 章：$\textbf{pandas}$ 高级应用 $\textbf{Advanced pandas}$**
