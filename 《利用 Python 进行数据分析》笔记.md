@@ -680,7 +680,12 @@ $\begin{cases}
 * 时间间隔（$interval$），由起始和结束时间戳表示。时期（$period$）可以被看做间隔（interval）的特例
 * 实验或过程时间，每个时间点都是相对于特定起始时间的一个度量。例如，从放入烤箱时起，每秒钟饼干的直径
 
-本章主要讲解前 $3$ 种时间序列。许多技术都可用于处理实验型时间序列，其索引可能是一个整数或浮点数（表示从实验开始算起已经过去的时间）。最简单也最常见的时间序列都是用时间戳进行索引的
+本章主要讲解前 $3$ 种时间序列。许多技术都可用于处理实验型时间序列，其索引可能是一个整数或浮点数（表示从实验开始算起已经过去的时间）。最简单也最常见的时间序列都是用时间戳进行索引的  
+$datetime$ 模块中的数据类型  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic009.png" width=60% />  
+$datetime$ 格式定义（兼容$ISO\ C89$）  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic010.png" width=60% />  
+
 <br/><br/><br/>
 
 ## **第 12 章：$\textbf{pandas}$ 高级应用 $\textbf{Advanced pandas}$**

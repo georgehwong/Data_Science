@@ -1686,9 +1686,9 @@ from datetime import timedelta
 start = datetime(2011, 1, 7)
 print(start + timedelta(12))
 print(start - 2 * timedelta(12))
-
-
-
+stamp = datetime(2011, 1, 3)
+print(str(stamp))
+print(stamp.strftime("%Y-%m-%d"))
 
 
 
