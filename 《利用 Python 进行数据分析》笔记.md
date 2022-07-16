@@ -685,6 +685,8 @@ $datetime$ 模块中的数据类型
 <img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic009.png" width=60% />  
 $datetime$ 格式定义（兼容$ISO\ C89$）  
 <img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic010.png" width=60% />  
+$datetime$ 对象还有一些特定于当前环境（位于不同国家或使用不同语言的系统）的格式化选项。例如，德语或法语系统所用的月份简写就与英语系统所用的不同。以下为特定于当前环境的日期格式  
+<img src="https://raw.githubusercontent.com/georgehwong/Data_Science/master/Pics/Python_for_Data_Analysis/Pic011.png" width=60% />  
 
 <br/><br/><br/>
 

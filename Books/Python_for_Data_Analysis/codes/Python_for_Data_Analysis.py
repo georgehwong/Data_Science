@@ -1689,17 +1689,27 @@ print(start - 2 * timedelta(12))
 stamp = datetime(2011, 1, 3)
 print(str(stamp))
 print(stamp.strftime("%Y-%m-%d"))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# datetime.strptime 可以用格式化编码将字符串转换为日期
+value = "2011-01-03"
+print(datetime.strptime(value, "%Y-%m-%d"))
+datestrs = ["7/6/2011", "8/6/2011"]
+print([datetime.strptime(x, "%m/%d/%Y") for x in datestrs])
+# datetime.strptime 是通过已知格式进行日期解析的最佳方式
+# 但是每次都要编写格式定义是很麻烦的事情，尤其是对于一些常见的日期格式
+# 这种情况下，可以用 dateutil 这个第三方包中的parser.parse方法（pandas中已经自动安装好了）
+from dateutil.parser import parse
+print(parse("2011-01-03"))
+# dateutil 可以解析几乎所有人类能够理解的日期表示形式
+print(parse("Jan 31, 1997 10:45 PM"))
+# 国际通用格式中，日在月前面很普遍，传入 dayfirst=True 即可解决这个问题
+print(parse("6/12/2011", dayfirst=True))
+# pandas 通常是用于处理成组日期的，不管这些日期是 DataFrame 的轴索引还是列
+# to_datetime 方法可以解析多种不同的日期表示形式
+# 对标准日期格式（如ISO8601）的解析非常快
+datestrs = ["2011-07-06 12:00:00", "2011-08-06 00:00:00"]
+print(pd.to_datetime(datestrs))
+# 它还可以处理缺失值（None、空字符串等）
+idx = pd.to_datetime(datestrs + [None])
+print(idx)
+print(idx[2])
+print(pd.isnull(idx))
